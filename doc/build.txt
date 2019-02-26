@@ -1,0 +1,2 @@
+* ant-design的安装需要配置.babelrc
+* style-components需要安装babel-plugin-styled-components的插件，并且配置.babelrc
