@@ -5,11 +5,8 @@ import env from '../../config/env';
 
 const RootStore = t
   .model({
-    host: t.optional(t.string, 'http://localhost'),
-    title: t.optional(t.string, '网络管理'),
-    //lang: t.optional(t.enumeration('lang', ['zh', 'en'])),
-    lang: t.optional(t.string, 'default'),
-    navigation: t.optional(NavigationStore, {nav: 'stream'}),
+    lang: t.optional(t.string, 'zh') ,
+    navigation: t.optional(NavigationStore, {nav: 'main'}),
   })
   .views(self => ({
   }))
@@ -18,8 +15,6 @@ const RootStore = t
     },
 
     setHost(host) {
-      //self.host = 'http://' + host
-      //self.host = 'http://192.168.20.182/api' 
       self.host = 'http://192.168.20.187/api' 
     },
 

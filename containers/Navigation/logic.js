@@ -1,17 +1,17 @@
 
-let navigation = null
+let store = null
 
 export function setNav(nav) {
-  navigation.setNav(nav)
+  store.navigation.setNav(nav)
 }
 
-
 export function getRoot() {
-  return navigation.root;
+  //return navigation.root;
+  return store;
 }
 
 export function init(selectedStore) {
-  navigation = selectedStore
+  store = selectedStore
 }
 
 

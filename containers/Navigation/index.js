@@ -1,13 +1,12 @@
+
 import React from 'react';
 import Router from 'next/router'
 import Link from 'next/link';
 
 import {inject, observer} from 'mobx-react';
-import R from 'ramda';
-import {storeSelector} from '../../utils/common';
+//import {checkLoginExpired, storeSelector} from '../../utils/common';
 
 import {Layout, Menu, Icon} from 'antd';
-import {HeaderLogo2} from '../../components/BaseStyle';
 import * as logic from './logic';
 import langmap from '../../config/langmap';
 
@@ -15,7 +14,8 @@ const {Header, Footer, Sider, Content} = Layout;
 
 class Navigation extends React.Component {
   componentWillMount() {
-    logic.init(this.props.navigation);
+    console.log("5555555555555555555555555", this.props);
+    logic.init(this.props.store);
   }
 
   componentWillUnmount() {}
@@ -25,10 +25,15 @@ class Navigation extends React.Component {
   };
 
   render() {
-    const {navigation} = this.props;
+    console.log("66666666666666", this.props);
+
+    const {navigation} = this.props.store;
+
+    console.log("77777777777777",navigation);
 
     return (
       <Sider style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}>
+
         <Menu
           onClick={this.handleClick}
           selectedKeys={[navigation.nav]}
@@ -36,16 +41,15 @@ class Navigation extends React.Component {
           mode="inline"
           defaultSelectedKeys={[navigation.nav]}
           style={{lineHeight: '64px'}}>
-
-          <Menu.Item key="main">
+          <Menu.Item key="stream1">
             <Icon type="cloud" />
-            <span>
-            test
-            </span>
-            <Link href="/index">
-            <a></a>
-            </Link>
+            我的生活
           </Menu.Item>
+          <Menu.Item key="stream2">
+            <Icon type="cloud" />
+            我的生活
+          </Menu.Item>
+
 
         </Menu>
       </Sider>
@@ -53,4 +57,7 @@ class Navigation extends React.Component {
   }
 }
 
-export default inject(storeSelector('navigation'))(observer(Navigation));
+export default inject('store')(observer(Navigation));
+
+
+

@@ -1,4 +1,4 @@
-import R from 'ramda';
+
 import Router from 'next/router'
 import {validToken} from './net';
 import {message} from 'antd';
@@ -32,10 +32,6 @@ function randomKey (len, chars) {
 export const randomString = (len, chars) => {
   return randomKey(len, chars);
 };
-
-export const storeSelector = R.curry((wantedStore, props) => ({
-  [wantedStore]: R.path(['store', wantedStore], props),
-}))
 
 export const genAntChildNumTab = (len, prefix, width) => {
   let children = [];
@@ -117,6 +113,7 @@ export function logout() {
   localStorage.clear()
   Router.push("/login")
 }
+
 
 
 

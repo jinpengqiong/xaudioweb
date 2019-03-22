@@ -11,6 +11,7 @@ function initRootStore(isServer = false, langSetup) {
     rootStore = createRootStore(isServer, langSetup);
   }
 
+  console.log("rrrrrrrrrrrrrr ", rootStore);
   return rootStore;
 }
 
