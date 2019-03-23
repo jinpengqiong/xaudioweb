@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import theme from '../../config/theme';
-import env from '../../config/env';
-import langmap from '../../config/langmap';
+import theme from '../config/theme';
+import env from '../config/env';
+import langmap from '../config/langmap';
 import {Header, Button, Row, Col, Menu, Dropdown, Icon} from 'antd';
-import {Margin} from '../BaseStyle';
-import LangConfig from '../LangConfig';
-import * as utils from '../../utils/common';
+import {Margin} from './BaseStyle';
+import LangConfig from './LangConfig';
+import * as utils from '../utils/common';
 
 
 const HeaderSetting = ({version, lang, setLang, logout}) => {

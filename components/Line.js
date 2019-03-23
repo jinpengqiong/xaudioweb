@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {WrapperAbsolute} from '../BaseStyle'; 
+import {WrapperAbsolute} from './BaseStyle'; 
 
 const StyledLine = styled.line.attrs({
   x1: props => props.x1,

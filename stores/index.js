@@ -1,4 +1,4 @@
-import RootStore from './RootStore';
+import RootStore from './root';
 
 let rootStore = null;
 
@@ -11,7 +11,6 @@ function initRootStore(isServer = false, langSetup) {
     rootStore = createRootStore(isServer, langSetup);
   }
 
-  console.log("rrrrrrrrrrrrrr ", rootStore);
   return rootStore;
 }
 
