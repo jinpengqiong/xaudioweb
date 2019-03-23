@@ -1,8 +1,28 @@
-module.exports = {
+const withLess = require('@zeit/next-less')
+const lessToJS = require('less-vars-to-js')
+const fs = require('fs')
+const path = require('path')
+
+// Where your antd-custom.less file lives
+const themeVariables = lessToJS(
+  fs.readFileSync(path.resolve(__dirname, './static/antd.less'), 'utf8')
+  )
+// fix: prevents error when .less files are required by node
+
+if (typeof require !== 'undefined') {
+  require.extensions['.less'] = file => {}
+}
+
+
+module.exports = withLess({
   exportPathMap: () => ({
     '/': { page: '/index' },
   }),
 
+  lessLoaderOptions: {
+    javascriptEnabled: true,
+    modifyVars: themeVariables // make your antd custom effective
+  },
 
   webpack: (config, { buildId, dev }) => {
     // Perform customizations to webpack config
@@ -25,4 +45,4 @@ module.exports = {
     // Important: return the modified config
     return config
   }
-}
+})
