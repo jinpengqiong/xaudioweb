@@ -1,13 +1,13 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'run', 'build' ]
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'run', 'dev' ]
 2 info using npm@2.14.12
 3 info using node@v4.3.1
-4 verbose run-script [ 'prebuild', 'build', 'postbuild' ]
-5 info prebuild lottery@1.0.0
-6 info build lottery@1.0.0
+4 verbose run-script [ 'predev', 'dev', 'postdev' ]
+5 info predev lottery@1.0.0
+6 info dev lottery@1.0.0
 7 verbose unsafe-perm in lifecycle true
-8 info lottery@1.0.0 Failed to exec build script
-9 verbose stack Error: lottery@1.0.0 build: `next build`
+8 info lottery@1.0.0 Failed to exec dev script
+9 verbose stack Error: lottery@1.0.0 dev: `node server.js`
 9 verbose stack Exit status 1
 9 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:214:16)
 9 verbose stack     at emitTwo (events.js:87:13)
@@ -20,17 +20,17 @@
 10 verbose pkgid lottery@1.0.0
 11 verbose cwd /Users/luolongzhi/Project/mygithub/xaudioweb
 12 error Darwin 16.4.0
-13 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "run" "build"
+13 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "run" "dev"
 14 error node v4.3.1
 15 error npm  v2.14.12
 16 error code ELIFECYCLE
-17 error lottery@1.0.0 build: `next build`
+17 error lottery@1.0.0 dev: `node server.js`
 17 error Exit status 1
-18 error Failed at the lottery@1.0.0 build script 'next build'.
+18 error Failed at the lottery@1.0.0 dev script 'node server.js'.
 18 error This is most likely a problem with the lottery package,
 18 error not with npm itself.
 18 error Tell the author that this fails on your system:
-18 error     next build
+18 error     node server.js
 18 error You can get their info via:
 18 error     npm owner ls lottery
 18 error There is likely additional logging output above.

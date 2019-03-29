@@ -41,7 +41,7 @@ export const HeaderLogo = styled.div`
 
 
 export const HeaderLogo2 = styled.div`
-  height: 40px;
+  height: 65px;
   background: ${props => (props.background ? props.background : '#333')};
   background-image: url(${props => props.backgroundImage+".jpg"}),
                     url(${props => props.backgroundImage+".png"}),
@@ -50,9 +50,8 @@ export const HeaderLogo2 = styled.div`
   background-repeat:no-repeat;
   background-position:center;
   background-size:cover;
-  margin: 16px;
+  margin: 4px;
 `;
-
 
 export const ZeroWrapper = styled.div`
   margin-top: 10px;
