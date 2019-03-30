@@ -15,9 +15,9 @@ if (typeof require !== 'undefined') {
 
 
 module.exports = withLess({
-  exportPathMap: () => ({
-    '/': { page: '/index' },
-  }),
+  //exportPathMap: () => ({
+    //'/': { page: '/index' },
+  //}),
 
   lessLoaderOptions: {
     javascriptEnabled: true,
