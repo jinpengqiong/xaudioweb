@@ -34,6 +34,7 @@ class Navigation extends React.Component {
        collapsible
        collapsed={navigation.collapsed}
        onCollapse={navigation.changeCollapsed}
+       style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, }}
       >
         <HeaderLogo2 backgroundImage={navigation.logo} />
         <br/>
@@ -49,6 +50,12 @@ class Navigation extends React.Component {
           <SubMenu key="audio_process" title={<span><Icon type="tool" /><span>{langmap.AudioProcess[lang]}</span></span>}>
             <Menu.Item key="audio_process_denoise">
               {langmap.AudioProcessDenoise[lang]}
+              <Link href="/denoise">
+              <a>hh</a>
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="audio_process_bgm">
+              {langmap.AudioProcessBgm[lang]}
             </Menu.Item>
           </SubMenu>
 
