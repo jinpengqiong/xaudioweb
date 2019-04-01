@@ -25,7 +25,7 @@ const DenoiseStore = t
       let input = e.target;
       let stdout = "";
       let stderr = "";
-      let worker = new Worker("../worker/xaudiopro.worker.js");
+      let worker = new Worker("../static/xaudiopro.worker.js");
 
       let reader = new FileReader();
       reader.onload = () => {
