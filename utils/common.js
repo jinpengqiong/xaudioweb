@@ -116,7 +116,7 @@ export function logout() {
 
 
 export function downFile(data, fileName) {
-
+/*
   var blob = new Blob([data], { type: 'application/octet-stream' });
 
   if (window.navigator.msSaveOrOpenBlob) {
@@ -128,6 +128,10 @@ export function downFile(data, fileName) {
     link.click();
     window.URL.revokeObjectURL(link.href);
   }
+*/
+
+  download( new Blob([data]), fileName, "application/octet-stream" );
+
 }
 
 

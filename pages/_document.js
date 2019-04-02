@@ -13,6 +13,7 @@ export default class MyDocument extends Document {
       <html>
         <Head>
           <title>管理后台</title>
+          <script src="/static/download.js"> </script>
           {styleTags}
         </Head>
         <body>

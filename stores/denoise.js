@@ -27,6 +27,10 @@ const DenoiseStore = t
       let stderr = "";
       let worker = new Worker("../static/xaudiopro.worker.js");
 
+      console.log("--------------", input);
+      let inputFileName = input.files[0].name;
+      let outputFileName = "denoise-" + inputFileName;
+
       let reader = new FileReader();
       reader.onload = () => {
         let arrayBuffer = reader.result;
@@ -35,8 +39,8 @@ const DenoiseStore = t
 
         worker.postMessage({
           type: "run", 
-          MEMFS: [{name: "hiss-one.wav", data: arrayBuffer}],
-          arguments: ["-i", "hiss-one.wav", "-o", "hiss-one-wasm.wav"],
+          MEMFS: [{name: inputFileName, data: arrayBuffer}],
+          arguments: ["-i", inputFileName, "-o", outputFileName],
         });
 
       };
@@ -63,7 +67,7 @@ const DenoiseStore = t
             break;
           case "done":
             console.log("44444444444444: ", msg.data);
-            downFile(msg.data, "hiss-one-wasm.wav");
+            downFile(msg.data, outputFileName);
             break;
         }
       };
