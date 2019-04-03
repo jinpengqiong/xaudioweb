@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react';
 import theme from '../config/theme';
 import env from '../config/env';
 
-import {Layout, Row, Col, Radio, Input} from 'antd';
+import {Layout, Row, Col, Radio, Input, Progress} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
 import {CommonHeader, CommonFooter} from './CommonHeaderFooter';
 
@@ -49,6 +49,8 @@ class DenoisePage extends React.Component {
                   <Radio style={radioStyle} value={"fft_lms"}>{langmap.DenoiseFFTLMS[lang]}</Radio>
                   <Radio style={radioStyle} value={"fft_lms_lpf"}>{langmap.DenoiseFFTLMSLPF[lang]}</Radio>
                 </RadioGroup>
+
+                <Progress percent={denoise.progress} />
 
                 <Input type='file' onChange={denoise.openFile}/>
 

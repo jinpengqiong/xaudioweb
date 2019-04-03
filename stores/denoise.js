@@ -9,6 +9,7 @@ const DenoiseStore = t
     gain: t.optional(t.number, 1.0),
     lpf_fc: t.optional(t.number, 0.6),
     fileName: t.optional(t.string, ''),
+    progress: t.optional(t.number, 0),
   })
   .views(self => ({
     get root() {
@@ -19,6 +20,10 @@ const DenoiseStore = t
   .actions(self => ({
     onChangeMode(e) {
       self.mode = e.target.value;
+    },
+
+    setProgress(progress) {
+      self.progress = progress;
     },
 
     openFile(e) {
@@ -32,6 +37,9 @@ const DenoiseStore = t
       let outputFileName = "denoise-" + inputFileName;
 
       let reader = new FileReader();
+
+      self.setProgress(0);
+
       reader.onload = () => {
         let arrayBuffer = reader.result;
 
@@ -50,11 +58,16 @@ const DenoiseStore = t
         var msg = e.data;
         switch (msg.type) {
           case "ready":
-            console.log("=======================> is ready");
+            //console.log("=======================> is ready");
             break;
           case "stdout":
             console.log("stdout: ", msg.data);
             stdout += msg.data + "\n";
+            //self.setProgress(parseProgress(msg.data));
+            let p = parseProgress(msg.data);
+            if (p >= 0)
+              self.setProgress(p);
+            console.log("===========> progress=", self.progress);
             break;
           case "stderr":
             console.log("stderr", msg.data);
@@ -66,15 +79,25 @@ const DenoiseStore = t
             worker.terminate();
             break;
           case "done":
-            console.log("44444444444444: ", msg.data);
-            downFile(msg.data, outputFileName);
+            //console.log("44444444444444: ", msg.data);
+            //downFile(msg.data, outputFileName);
+            self.setProgress(100);
             break;
         }
       };
     },
 
-
   }));
+
+const parseProgress = (info) => {
+  let p = -1;
+
+  if (info.indexOf("progress") >= 0) {
+    p = parseInt(info.split("=")[1]);
+  }
+
+  return p;
+}
 
 export default DenoiseStore;
 
