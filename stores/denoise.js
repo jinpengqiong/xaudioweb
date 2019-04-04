@@ -27,26 +27,25 @@ const DenoiseStore = t
       self.progress = progress;
     },
 
-    openFile(e) {
-      let input = e.target;
-      let stdout = "";
-      let stderr = "";
+    openFile(file) {
       let worker = new Worker("../static/xaudiopro.worker.js");
 
-      console.log("--------------", input);
-      let inputFileName = input.files[0].name;
+      let inputFileName = file.name;
       let outputFileName = "denoise-" + inputFileName;
 
       let reader = new FileReader();
+      let fileSize = file.size;
+      let pp = 0;
 
+      console.log("111111111111: ", file.size);
       self.setProgress(0);
+      self.fileName = inputFileName;
 
       reader.onload = () => {
         let arrayBuffer = reader.result;
 
-        console.log(arrayBuffer.byteLength);
-
-        console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
+        //console.log(arrayBuffer.byteLength);
+        //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
         worker.postMessage({
           type: "run", 
           MEMFS: [{name: inputFileName, data: arrayBuffer}],
@@ -54,48 +53,55 @@ const DenoiseStore = t
         });
 
       };
-      reader.readAsArrayBuffer(input.files[0]);
+      reader.readAsArrayBuffer(file);
 
       worker.onmessage = (e) => {
         var msg = e.data;
         switch (msg.type) {
           case "ready":
-            //console.log("=======================> is ready");
+            console.log("=======================> is ready");
+            self.setProgress(2);
             break;
           case "stdout":
-            console.log("stdout: ", msg.data);
-            stdout += msg.data + "\n";
-            //self.setProgress(parseProgress(msg.data));
-            let p = parseProgress(msg.data);
-            if (p >= 0)
-              self.setProgress(p);
-            console.log("===========> progress=", self.progress);
+            let p = parseProgress(fileSize, msg.data);
+            if (p >= 0) {
+              if (pp != p) {
+                console.log("===========> progress=", self.progress);
+                self.setProgress(p);
+                pp = p;
+              }
+            }
             break;
           case "stderr":
-            console.log("stderr", msg.data);
-            stderr += msg.data + "\n";
             break;
           case "exit":
-            console.log("Process exited with code " + msg.data);
-            console.log(stdout);
+            //console.log(stdout);
             worker.terminate();
             break;
           case "done":
             self.setProgress(100);
             //console.log("44444444444444: ", msg.data);
-            downFile(msg.data, outputFileName);
+            //downFile(msg.data, outputFileName);
             break;
         }
       };
+      //console.log("-eeeeeeeeeeeeeeeeeeeeeeee end");
     },
 
   }));
 
-const parseProgress = (info) => {
+const parseProgress = (fileSize, info) => {
   let p = -1;
-
+/*
   if (info.indexOf("progress") >= 0) {
     p = parseInt(info.split("=")[1]);
+  }
+*/
+
+  if (info.indexOf("current_size") >= 0) {
+    p = parseInt(info.split("=")[1]);
+
+    return parseInt(p*100/fileSize);
   }
 
   return p;

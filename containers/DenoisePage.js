@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react';
 import theme from '../config/theme';
 import env from '../config/env';
 
-import {Layout, Row, Col, Radio, Input, Progress} from 'antd';
+import {Layout, Row, Col, Radio, Input, Progress, Button, Upload, Icon} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
 import {CommonHeader, CommonFooter} from './CommonHeaderFooter';
 
@@ -52,7 +52,15 @@ class DenoisePage extends React.Component {
 
                 <Progress percent={denoise.progress} />
 
-                <Input type='file' onChange={denoise.openFile}/>
+
+                <Upload 
+                 action=""
+                 beforeUpload={denoise.openFile}
+                 >
+                  <Button>
+                    <Icon type="upload"/> {"upload"} 
+                  </Button>
+                </Upload>
 
 
               </WrapperRelative>
@@ -66,6 +74,7 @@ class DenoisePage extends React.Component {
   }
 }
 
+                //<Input type='file' onChange={denoise.openFile}/>
 export default inject('store')(observer(DenoisePage))
 
 
