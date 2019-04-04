@@ -5,7 +5,8 @@ import { downFile } from '../utils/common';
 
 const DenoiseStore = t
   .model({
-    mode: t.optional(t.string, 'fft_lms_lpf'),
+    //mode: t.optional(t.string, 'fft_lms_lpf'),
+    mode: t.optional(t.string, 'rnn'),
     gain: t.optional(t.number, 1.0),
     lpf_fc: t.optional(t.number, 0.6),
     fileName: t.optional(t.string, ''),
@@ -45,10 +46,11 @@ const DenoiseStore = t
 
         console.log(arrayBuffer.byteLength);
 
+        console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
         worker.postMessage({
           type: "run", 
           MEMFS: [{name: inputFileName, data: arrayBuffer}],
-          arguments: ["-i", inputFileName, "-o", outputFileName],
+          arguments: ["-t", parseMode(self.mode), "-i", inputFileName, "-o", outputFileName],
         });
 
       };
@@ -79,9 +81,9 @@ const DenoiseStore = t
             worker.terminate();
             break;
           case "done":
-            //console.log("44444444444444: ", msg.data);
-            //downFile(msg.data, outputFileName);
             self.setProgress(100);
+            //console.log("44444444444444: ", msg.data);
+            downFile(msg.data, outputFileName);
             break;
         }
       };
@@ -97,6 +99,18 @@ const parseProgress = (info) => {
   }
 
   return p;
+}
+
+const parseMode = (modeName) => {
+  if (modeName == "rnn") {
+    return "0";
+  } else if (modeName == "fft_lms") {
+    return "2";
+  } else if (modeName == "fft_lms_lpf") {
+    return "3";
+  } else {
+    return "2";
+  }
 }
 
 export default DenoiseStore;
