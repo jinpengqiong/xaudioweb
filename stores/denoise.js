@@ -1,12 +1,9 @@
 import {types as t, flow, getParent} from 'mobx-state-tree';
-
-//import Worker from '../worker/xaudiopro.worker.js';
 import { downFile } from '../utils/common';
 
 const DenoiseStore = t
   .model({
-    //mode: t.optional(t.string, 'fft_lms_lpf'),
-    mode: t.optional(t.string, 'rnn'),
+    mode: t.optional(t.string, 'fft_lms_lpf'),
     gain: t.optional(t.number, 1.0),
     lpf_fc: t.optional(t.number, 0.6),
     fileName: t.optional(t.string, ''),
@@ -86,6 +83,7 @@ const DenoiseStore = t
         }
       };
       //console.log("-eeeeeeeeeeeeeeeeeeeeeeee end");
+      return true;
     },
 
   }));

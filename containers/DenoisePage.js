@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react';
 import theme from '../config/theme';
 import env from '../config/env';
 
-import {Layout, Row, Col, Radio, Input, Progress, Button, Upload, Icon} from 'antd';
+import {Layout, Row, Col, Radio, Input, Progress, Button, Upload, Icon, Slider, Switch, Alert} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
 import {CommonHeader, CommonFooter} from './CommonHeaderFooter';
 
@@ -43,24 +43,36 @@ class DenoisePage extends React.Component {
           <Layout style={{ marginLeft: 200 }}>
             <CommonHeader/>
             <Content>
-              <WrapperRelative>
-                <RadioGroup onChange={denoise.onChangeMode} value={denoise.mode}>
-                  <Radio style={radioStyle} value={"rnn"}>{langmap.DenoiseRNN[lang]}</Radio>
-                  <Radio style={radioStyle} value={"fft_lms"}>{langmap.DenoiseFFTLMS[lang]}</Radio>
-                  <Radio style={radioStyle} value={"fft_lms_lpf"}>{langmap.DenoiseFFTLMSLPF[lang]}</Radio>
-                </RadioGroup>
+              <WrapperRelative top={"30px"}>
+                <Row>
+                  <Col span={24} offset={1}>
+                    <RadioGroup onChange={denoise.onChangeMode} value={denoise.mode}>
+                      <Radio style={radioStyle} value={"fft_lms_lpf"}>{langmap.DenoiseFFTLMSLPF[lang]}</Radio>
+                      <WrapperRelative left={"25px"}>
+                        {langmap.DenoiseFFTLMSLPFDesc[lang]}
+                      </WrapperRelative>
+                      <br/>
+                      <Radio style={radioStyle} value={"fft_lms"}>{langmap.DenoiseFFTLMS[lang]}</Radio>
+                      <br/>
+                      <Radio style={radioStyle} value={"rnn"}>{langmap.DenoiseRNN[lang]}</Radio>
+                    </RadioGroup>
+                    <br/>
+                    <Progress percent={denoise.progress} />
 
-                <Progress percent={denoise.progress} />
 
+                    <Upload 
+                     action=""
+                     beforeUpload={denoise.openFile}
+                     showUploadList={false}
+                     >
+                      <Button>
+                        <Icon type="upload"/> {"upload"} 
+                      </Button>
+                    </Upload>
+                    <div>{denoise.fileName} </div>
+                  </Col>
+                </Row>
 
-                <Upload 
-                 action=""
-                 beforeUpload={denoise.openFile}
-                 >
-                  <Button>
-                    <Icon type="upload"/> {"upload"} 
-                  </Button>
-                </Upload>
 
 
               </WrapperRelative>
@@ -75,6 +87,7 @@ class DenoisePage extends React.Component {
 }
 
                 //<Input type='file' onChange={denoise.openFile}/>
+                        //<Alert message={langmap.DenoiseFFTLMSLPFDesc[lang]} type="warning" />
 export default inject('store')(observer(DenoisePage))
 
 
