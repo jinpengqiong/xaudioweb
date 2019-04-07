@@ -4,8 +4,8 @@ import { downFile } from '../utils/common';
 const DenoiseStore = t
   .model({
     mode: t.optional(t.string, 'fft_lms_lpf'),
-    gain: t.optional(t.number, 1.0),
-    lpf_fc: t.optional(t.number, 0.6),
+    gain: t.optional(t.string, "1.0"),
+    lpfFc: t.optional(t.string, "0.6"),
     fileName: t.optional(t.string, ''),
     progress: t.optional(t.number, 0),
   })
@@ -16,6 +16,10 @@ const DenoiseStore = t
 
   }))
   .actions(self => ({
+    updateAttrs(e) {
+      self[e.target.name] = e.target.value; 
+    },
+
     onChangeMode(e) {
       self.mode = e.target.value;
     },

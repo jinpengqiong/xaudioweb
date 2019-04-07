@@ -4,7 +4,9 @@ import {inject, observer} from 'mobx-react';
 import theme from '../config/theme';
 import env from '../config/env';
 
-import {Layout, Row, Col, Radio, Input, Progress, Button, Upload, Icon, Slider, Switch, Alert} from 'antd';
+import {Layout, Row, Col, Radio, Input, Progress, 
+        Button, Upload, Icon, Slider, Switch, Alert,
+        Form, Divider} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
 import {CommonHeader, CommonFooter} from './CommonHeaderFooter';
 
@@ -19,6 +21,19 @@ const radioStyle = {
   height: '30px',
   lineHeight: '30px',
 };
+
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 12 },
+    sm: { span: 3 },
+    style: {"text-align": "left"}
+  },
+  wrapperCol: {
+    xs: { span: 6 },
+    sm: { span: 6 },
+  },
+};
+
 
 class DenoisePage extends React.Component {
 
@@ -45,31 +60,53 @@ class DenoisePage extends React.Component {
             <Content>
               <WrapperRelative top={"30px"}>
                 <Row>
-                  <Col span={24} offset={1}>
+                  <Col span={30} offset={1}>
                     <RadioGroup onChange={denoise.onChangeMode} value={denoise.mode}>
                       <Radio style={radioStyle} value={"fft_lms_lpf"}>{langmap.DenoiseFFTLMSLPF[lang]}</Radio>
                       <WrapperRelative left={"25px"}>
                         {langmap.DenoiseFFTLMSLPFDesc[lang]}
+                        <WrapperRelative top={"20px"}>
+                          <Form >
+                            <Form.Item {...formItemLayout} label={langmap.DenoiseGain[lang] }>
+                              <Input value={denoise.gain} name="gain" onChange={denoise.updateAttrs} addonAfter="[0.5 - 3.0]"/>
+                            </Form.Item>
+                            <Form.Item {...formItemLayout} label={langmap.DenoiseLPFFc[lang]}>
+                              <Input value={denoise.lpfFc} name="lpfFc" onChange={denoise.updateAttrs} addonAfter="[0.3 - 1.0]"/>
+                            </Form.Item>
+                          </Form>
+                        </WrapperRelative>
                       </WrapperRelative>
-                      <br/>
+                      <Divider />
                       <Radio style={radioStyle} value={"fft_lms"}>{langmap.DenoiseFFTLMS[lang]}</Radio>
-                      <br/>
+                      <WrapperRelative left={"25px"}>
+                        {langmap.DenoiseFFTLMSDesc[lang]}
+                        <WrapperRelative top={"20px"}>
+                          <Form >
+                            <Form.Item {...formItemLayout} label={langmap.DenoiseGain[lang] }>
+                              <Input value={denoise.gain} name="gain" onChange={denoise.updateAttrs} addonAfter="[0.5 - 3.0]"/>
+                            </Form.Item>
+                          </Form>
+                        </WrapperRelative>
+                      </WrapperRelative>
+                      <Divider />
                       <Radio style={radioStyle} value={"rnn"}>{langmap.DenoiseRNN[lang]}</Radio>
                     </RadioGroup>
+                    <Divider />
                     <br/>
-                    <Progress percent={denoise.progress} />
-
-
-                    <Upload 
-                     action=""
-                     beforeUpload={denoise.openFile}
-                     showUploadList={false}
-                     >
-                      <Button>
-                        <Icon type="upload"/> {"upload"} 
-                      </Button>
-                    </Upload>
-                    <div>{denoise.fileName} </div>
+                    <Col span={20}>
+                      <Progress percent={denoise.progress} />
+                      <br/>
+                      <Upload 
+                       action=""
+                       beforeUpload={denoise.openFile}
+                       showUploadList={false}
+                       >
+                        <Button>
+                          <Icon type="upload"/> {"upload"} 
+                        </Button>
+                      </Upload>
+                      <div>{denoise.fileName} </div>
+                    </Col>
                   </Col>
                 </Row>
 

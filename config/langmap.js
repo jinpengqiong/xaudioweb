@@ -25,26 +25,38 @@ const langmap = {
 
   DenoiseFFTLMS: {
     'default': '',
-    'zh': '谱减去噪2',
+    'zh': '频域谱减去噪2',
     'en': 'Spectrum Denoise',
   },
 
   DenoiseFFTLMSDesc: {
     'default': '',
-    'zh': '谱减去噪2',
+    'zh': '同谱减去噪1, 只是不进行低通滤波, 频域成份保留更完整',
     'en': 'Spectrum Denoise',
   },
 
   DenoiseFFTLMSLPF: {
     'default': '',
-    'zh': '谱减去噪1',
+    'zh': '频域谱减去噪1',
     'en': 'Spectrum Denoise',
   },
 
   DenoiseFFTLMSLPFDesc: {
     'default': '',
-    'zh': '在频域上消除背景噪声，并进行低通滤波。适用于白噪声/hiss噪声/粉红噪声的场景；可通过修改增益值和低通滤波截止系数来增强或减弱谱减强度',
+    'zh': '谱减去噪,并滤除高频噪声. 适用于白噪声/hiss噪声的场景; 增加增益值加强谱减程度, 降低截止系数去除更多高频噪声',
     'en': 'Spectrum Denoise',
+  },
+
+  DenoiseGain: {
+    'default': '',
+    'zh': '增益系数',
+    'en': 'Denoise Gain Cof',
+  },
+
+  DenoiseLPFFc: {
+    'default': '',
+    'zh': '截止系数',
+    'en': 'LPF fc cof',
   },
 
   DenoiseLearn1: {
