@@ -29,7 +29,7 @@ const DenoiseStore = t
     },
 
     openFile(file) {
-      let worker = new Worker("../static/xaudiopro.worker.js");
+      let worker = new Worker("../static/xadenoise.worker.js");
 
       let inputFileName = file.name;
       let outputFileName = "denoise-" + inputFileName;
@@ -120,6 +120,19 @@ const parseMode = (modeName) => {
     return "2";
   }
 }
-
+/*
+const getArguments = (mode, gain, lpfFc, inputFileName, outputFileName) => {
+  if (modeName == "rnn") {
+    return ["-t", "0", "-i", inputFileName, "-o", outputFileName],
+  } else if (modeName == "fft_lms") {
+    return ["-t", "2", "-i", inputFileName, "-o", outputFileName],
+    return "2";
+  } else if (modeName == "fft_lms_lpf") {
+    return "3";
+  } else {
+    return "2";
+  }
+}
+*/
 export default DenoiseStore;
 
