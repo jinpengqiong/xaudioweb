@@ -56,6 +56,9 @@ class Navigation extends React.Component {
             </Menu.Item>
             <Menu.Item key="audio_process_bgm">
               {langmap.AudioProcessBgm[lang]}
+              <Link href="/bgm">
+              <a>hh</a>
+              </Link>
             </Menu.Item>
           </SubMenu>
 

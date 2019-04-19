@@ -1,5 +1,5 @@
 import {types as t, flow, getParent} from 'mobx-state-tree';
-import { downFile } from '../utils/common';
+import { processAudioFile } from '../utils/common';
 
 const DenoiseStore = t
   .model({
@@ -29,85 +29,10 @@ const DenoiseStore = t
     },
 
     openFile(file) {
-      let worker = new Worker("../static/xadenoise.worker.js");
-
-      let inputFileName = file.name;
-      let outputFileName = "denoise-" + inputFileName;
-
-      let reader = new FileReader();
-      let fileSize = file.size;
-      let pp = 0;
-
-      console.log("111111111111: ", file.size);
-      self.setProgress(0);
-      self.fileName = inputFileName;
-
-      reader.onload = () => {
-        let arrayBuffer = reader.result;
-
-        //console.log(arrayBuffer.byteLength);
-        //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
-        worker.postMessage({
-          type: "run", 
-          MEMFS: [{name: inputFileName, data: arrayBuffer}],
-          arguments: ["-t", parseMode(self.mode), "-i", inputFileName, "-o", outputFileName],
-        });
-
-      };
-      reader.readAsArrayBuffer(file);
-
-      worker.onmessage = (e) => {
-        var msg = e.data;
-        switch (msg.type) {
-          case "ready":
-            console.log("=======================> is ready");
-            self.setProgress(2);
-            break;
-          case "stdout":
-            let p = parseProgress(fileSize, msg.data);
-            if (p >= 0) {
-              if (pp != p) {
-                console.log("===========> progress=", self.progress);
-                self.setProgress(p);
-                pp = p;
-              }
-            }
-            break;
-          case "stderr":
-            break;
-          case "exit":
-            //console.log(stdout);
-            worker.terminate();
-            break;
-          case "done":
-            self.setProgress(100);
-            //console.log("44444444444444: ", msg.data);
-            //downFile(msg.data, outputFileName);
-            break;
-        }
-      };
-      //console.log("-eeeeeeeeeeeeeeeeeeeeeeee end");
-      return true;
+      return processAudioFile(self, file, "../static/xadenoise.worker.js", ["-t", parseMode(self.mode)], "denoise-");
     },
 
   }));
-
-const parseProgress = (fileSize, info) => {
-  let p = -1;
-/*
-  if (info.indexOf("progress") >= 0) {
-    p = parseInt(info.split("=")[1]);
-  }
-*/
-
-  if (info.indexOf("current_size") >= 0) {
-    p = parseInt(info.split("=")[1]);
-
-    return parseInt(p*100/fileSize);
-  }
-
-  return p;
-}
 
 const parseMode = (modeName) => {
   if (modeName == "rnn") {
@@ -120,19 +45,6 @@ const parseMode = (modeName) => {
     return "2";
   }
 }
-/*
-const getArguments = (mode, gain, lpfFc, inputFileName, outputFileName) => {
-  if (modeName == "rnn") {
-    return ["-t", "0", "-i", inputFileName, "-o", outputFileName],
-  } else if (modeName == "fft_lms") {
-    return ["-t", "2", "-i", inputFileName, "-o", outputFileName],
-    return "2";
-  } else if (modeName == "fft_lms_lpf") {
-    return "3";
-  } else {
-    return "2";
-  }
-}
-*/
+
 export default DenoiseStore;
 
