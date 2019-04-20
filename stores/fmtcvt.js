@@ -22,7 +22,6 @@ const FmtcvtStore = t
     },
 
     openFile(file) {
-      //return processFFmpegFile(selfEnv, file, "../static/ffmpegaudio.worker.js", workerArgs, "fmtcvt-", "aac");
       return processFFmpegFile(self, file, "../static/ffmpegaudio.worker.js", ["-c:a", "libfdk_aac", "-profile:a", "aac_he_v2", "-b:a", "24k"], "fmtcvt-", "adts");
     },
 

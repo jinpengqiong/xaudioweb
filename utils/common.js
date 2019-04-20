@@ -134,6 +134,8 @@ export function downFile(data, fileName) {
 
 }
 
+let gFFmpegDuration = 0;
+let gFFmpegProgress = 0;
 
 export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputPrefix, outputFmt) {
 
@@ -152,6 +154,9 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
   reader.onload = () => {
     let arrayBuffer = reader.result;
 
+    gFFmpegDuration = 0;
+    gFFmpegProgress = 0;
+
     //console.log(arrayBuffer.byteLength);
     //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
     worker.postMessage({
@@ -168,19 +173,28 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
     switch (msg.type) {
       case "ready":
         console.log("=======================> is ready");
-        selfEnv.setProgress(2);
+        selfEnv.setProgress(0);
         break;
       case "stdout":
-        let p = parseProgress(fileSize, msg.data);
-        if (p >= 0) {
-          if (pp != p) {
-            console.log("===========> progress=", self.progress);
-            selfEnv.setProgress(p);
-            pp = p;
-          }
-        }
+        console.log("===========> data=", msg.data);
+        //let p = parseProgress(fileSize, msg.data);
+        //if (p >= 0) {
+          //if (pp != p) {
+            //console.log("===========> progress=", self.progress);
+            //selfEnv.setProgress(p);
+            //pp = p;
+          //}
+        //}
         break;
       case "stderr":
+        console.log("===========> data=", msg.data);
+
+        let tmpProgress = parseFFmpegProgress(gFFmpegDuration, gFFmpegProgress, msg.data);
+        gFFmpegDuration = tmpProgress.duration;
+        gFFmpegProgress = tmpProgress.progress;
+
+        selfEnv.setProgress(gFFmpegProgress);
+
         break;
       case "exit":
         //console.log(stdout);
@@ -189,7 +203,7 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
       case "done":
         selfEnv.setProgress(100);
         //console.log("44444444444444: ", msg.data);
-        downFile(msg.data, outputFileName);
+        //downFile(msg.data, outputFileName);
         break;
     }
   };
@@ -263,6 +277,42 @@ export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPr
   //console.log("-eeeeeeeeeeeeeeeeeeeeeeee end");
   return true;
 
+}
+
+const parseFFmpegProgress = (duration, progress, info) => {
+  if (duration == 0) {
+    if (info.indexOf("Duration") >= 0) {
+      let timeArray = info.replace(/\s*/g,"").split(",")[0].split(":");
+      let hour = parseInt(timeArray[1]);
+      let min = parseInt(timeArray[2]);
+      let sec = parseInt(timeArray[3].split(".")[0]);
+
+      return {
+        duration: hour*3600 + min*60 + sec,
+        progress: 0 
+      };
+    } else {
+      return {duration: 0, progress: 0};
+    }
+  } else {
+    if (info.indexOf("time=") >= 0) {
+      let timeArray = info.replace(/\s*/g, "").split("bitrate")[0].split("time=")[1].split(":");
+      let hour = parseInt(timeArray[0]);
+      let min = parseInt(timeArray[1]);
+      let sec = parseInt(timeArray[2].split(".")[0]);
+
+      return {
+        duration: duration,
+        progress: parseInt((hour*3600+min*60+sec)*100 / duration)
+      }
+    } else {
+      return {
+        duration: duration, 
+        progress: progress 
+      };
+    }
+
+  }
 }
 
 const parseProgress = (fileSize, info) => {
