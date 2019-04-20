@@ -4,6 +4,7 @@ import env from '../config/env';
 import NavigationStore from './navigation';
 import DenoiseStore from './denoise';
 import BgmStore from './bgm';
+import FmtcvtStore from './fmtcvt';
 
 const RootStore = t
   .model({
@@ -12,6 +13,7 @@ const RootStore = t
     navigation: t.optional(NavigationStore, {nav: 'audio_process_denoise'}),
     denoise: t.optional(DenoiseStore, {}),
     bgm: t.optional(BgmStore, {}),
+    fmtcvt: t.optional(FmtcvtStore, {}),
   })
   .views(self => ({
   }))

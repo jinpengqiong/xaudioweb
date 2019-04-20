@@ -134,6 +134,74 @@ export function downFile(data, fileName) {
 
 }
 
+
+export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputPrefix, outputFmt) {
+
+  let worker = new Worker(workerPath);
+
+  let inputFileName = file.name;
+  let outputFileName = outputPrefix + inputFileName;
+
+  let reader = new FileReader();
+  let fileSize = file.size;
+  let pp = 0;
+
+  selfEnv.setProgress(0);
+  selfEnv.fileName = inputFileName;
+
+  reader.onload = () => {
+    let arrayBuffer = reader.result;
+
+    //console.log(arrayBuffer.byteLength);
+    //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
+    worker.postMessage({
+      type: "run", 
+      MEMFS: [{name: inputFileName, data: arrayBuffer}],
+      arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-f", outputFmt, "out.aac"]),
+    });
+
+  };
+  reader.readAsArrayBuffer(file);
+
+  worker.onmessage = (e) => {
+    var msg = e.data;
+    switch (msg.type) {
+      case "ready":
+        console.log("=======================> is ready");
+        selfEnv.setProgress(2);
+        break;
+      case "stdout":
+        let p = parseProgress(fileSize, msg.data);
+        if (p >= 0) {
+          if (pp != p) {
+            console.log("===========> progress=", self.progress);
+            selfEnv.setProgress(p);
+            pp = p;
+          }
+        }
+        break;
+      case "stderr":
+        break;
+      case "exit":
+        //console.log(stdout);
+        worker.terminate();
+        break;
+      case "done":
+        selfEnv.setProgress(100);
+        //console.log("44444444444444: ", msg.data);
+        downFile(msg.data, outputFileName);
+        break;
+    }
+  };
+  //console.log("-eeeeeeeeeeeeeeeeeeeeeeee end");
+  return true;
+
+}
+
+
+
+
+
 export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPrefix) {
 
   let worker = new Worker(workerPath);
