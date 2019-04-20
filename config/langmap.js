@@ -101,6 +101,36 @@ const langmap = {
     'en': 'Format Covert',
   },
 
+  OutputFormat: {
+    'default': '',
+    'zh': '输出格式',
+    'en': 'Output Format',
+  },
+
+  SampleRate: {
+    'default': '',
+    'zh': '采样率',
+    'en': 'SampleRate',
+  },
+
+  Bitrate: {
+    'default': '',
+    'zh': '码率',
+    'en': 'BitRate',
+  },
+
+  Channel: {
+    'default': '',
+    'zh': '通道数',
+    'en': 'Channel',
+  },
+
+  Recommend: {
+    'default': '',
+    'zh': '推荐',
+    'en': 'Recommend',
+  },
+
 
 
 
