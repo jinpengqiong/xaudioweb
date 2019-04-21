@@ -137,12 +137,14 @@ export function downFile(data, fileName) {
 let gFFmpegDuration = 0;
 let gFFmpegProgress = 0;
 
-export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputPrefix, outputFmt) {
+export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputPrefix, outputFmtName, outputFmt) {
 
   let worker = new Worker(workerPath);
 
   let inputFileName = file.name;
-  let outputFileName = outputPrefix + inputFileName;
+  //let outputFileName = outputPrefix + inputFileName;
+  let tmpName = inputFileName.split(".");
+  let outputFileName = tmpName[tmpName.length-2] + "." + outputFmtName;
 
   let reader = new FileReader();
   let fileSize = file.size;
@@ -203,7 +205,7 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
       case "done":
         selfEnv.setProgress(100);
         //console.log("44444444444444: ", msg.data);
-        //downFile(msg.data, outputFileName);
+        downFile(msg.data, outputFileName);
         break;
     }
   };

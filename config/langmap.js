@@ -125,6 +125,18 @@ const langmap = {
     'en': 'Channel',
   },
 
+  Mono: {
+    'default': '',
+    'zh': '单声道',
+    'en': 'Mono',
+  },
+
+  Stereo: {
+    'default': '',
+    'zh': '立体声',
+    'en': 'Stereo',
+  },
+
   Recommend: {
     'default': '',
     'zh': '推荐',

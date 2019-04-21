@@ -69,6 +69,10 @@ const FmtcvtStore = t
       self.samplerate = value;
     },
 
+    changeChannel(value) {
+      self.channel = value;
+    },
+
     changeBitrate(value) {
       self.bitrate = value;
     },
@@ -78,10 +82,52 @@ const FmtcvtStore = t
     },
 
     openFile(file) {
-      return processFFmpegFile(self, file, "../static/ffmpegaudio.worker.js", ["-c:a", "libfdk_aac", "-profile:a", "aac_he_v2", "-b:a", "24k"], "fmtcvt-", "adts");
+      return processFFmpegFile(self, file, "../static/ffmpegaudio.worker.js", 
+                               toFFmpegArgs(self.fmt, self.samplerate, self.channel, self.bitrate), 
+                               "fmtcvt-", 
+                               self.fmt,
+                               toFFmpegFmtName(self.fmt));
     },
 
   }));
+
+const samplerateString = (samplerate) => {
+  let sr = parseInt(parseFloat(samplerate)*1000)
+  return sr.toString();
+}
+
+const toFFmpegArgs = (fmt, samplerate, channel, bitrate) => {
+  if (fmt == 'mp3') {
+    return ["-c:a", "libmp3lame", "-ar", samplerateString(samplerate), "-ac", channel, "-b:a", bitrate+"000"];
+  } else if (fmt == 'aac' || fmt == 'm4a') {
+    let bitrateInt = parseInt(bitrate);
+    let channelInt = parseInt(channel);
+
+    let bitratePerChn = parseInt(bitrateInt / channelInt);
+
+    if (bitratePerChn <= 24) {
+      //user aac_he_v2
+      return ["-c:a", "libfdk_aac", "-ar", samplerateString(samplerate), "-ac", channel, "-profile:a", "aac_he_v2", "-b:a", bitrate+"k"]
+    } else if(bitratePerChn <= 56) {
+      //user aac_he
+      return ["-c:a", "libfdk_aac", "-ar", samplerateString(samplerate), "-ac", channel, "-profile:a", "aac_he", "-b:a", bitrate+"k"]
+    } else {
+      //user aac_low
+      return ["-c:a", "libfdk_aac", "-ar", samplerateString(samplerate), "-ac", channel, "-profile:a", "aac_low", "-b:a", bitrate+"k"]
+    }
+  }
+}
+
+const toFFmpegFmtName = (fmt) => {
+  if (fmt == 'mp3') {
+    return 'mp3';
+  } else if (fmt == 'aac') {
+    return 'adts';
+  } else if (fmt == 'm4a') {
+    return 'm4a';
+  }
+}
+
 
 export default FmtcvtStore;
 

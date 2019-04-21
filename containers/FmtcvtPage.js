@@ -61,6 +61,14 @@ const SamplerateOptions = ({...fmtcvtConfig}) => {
 };
 
 
+const ChannelOptions = ({...fmtcvtConfig}) => { 
+  return (<Select value={fmtcvtConfig.channel}  onChange={fmtcvtConfig.changeChannel}>
+            <Option key={'channel_stereo'} value={'2'}>{langmap.Stereo[fmtcvtConfig.lang]}</Option>
+            <Option key={'channel_mono'} value={'1'}>{langmap.Mono[fmtcvtConfig.lang]}</Option>
+         </Select>)
+};
+
+
 const bitrateName = (lang, bitrate, defaultBitrate) => {
   if (bitrate == defaultBitrate) {
     return bitrate + ' kbps (' + langmap.Recommend[lang] + ')';
@@ -72,8 +80,6 @@ const bitrateName = (lang, bitrate, defaultBitrate) => {
 const BitrateOptions = ({...fmtcvtConfig}) => { 
   let list = [];
   let bitrateList, defaultBitrate, handleChange;
-
-  console.log("kkkkkk1111111111111", fmtcvtConfig.fmt);
 
   switch (fmtcvtConfig.fmt) {
     case 'mp3':
@@ -92,8 +98,6 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
               </Option>)
   }
 
-  console.log("yyykkkkkk1111111111111", list);
-  console.log("nnyyykkkkkk1111111111111", fmtcvtConfig.bitrate);
   return (<Select value={fmtcvtConfig.bitrate}  onChange={fmtcvtConfig.changeBitrate}>
           {list}
          </Select>)
@@ -132,8 +136,6 @@ class FmtcvtPage extends React.Component {
       changeBitrate: fmtcvt.changeBitrate
     };
 
-    console.log("0000000000", fmtcvtConfig.fmt);
-
     return (
       <div>
         <Layout style={{ minHeight: '100vh' }}>
@@ -155,6 +157,9 @@ class FmtcvtPage extends React.Component {
                         <SamplerateOptions {...fmtcvtConfig}/>
                       </Form.Item>
 
+                      <Form.Item {...formItemLayout} label={langmap.Channel[lang] }>
+                        <ChannelOptions {...fmtcvtConfig}/>
+                      </Form.Item>
 
                       <Form.Item {...formItemLayout} label={langmap.Bitrate[lang] }>
                         <BitrateOptions {...fmtcvtConfig}/>
