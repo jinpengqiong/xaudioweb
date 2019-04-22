@@ -23,6 +23,8 @@ class Navigation extends React.Component {
 
   handleClick = e => {
     const {navigation} = this.props.store;
+
+    console.log("1111111111111111", e.key);
     navigation.setNav(e.key);
   };
 
@@ -31,9 +33,6 @@ class Navigation extends React.Component {
 
     return (
       <Sider
-       collapsible
-       collapsed={navigation.collapsed}
-       onCollapse={navigation.changeCollapsed}
        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, }}
       >
         <HeaderLogo2 backgroundImage={navigation.logo} />
@@ -49,24 +48,21 @@ class Navigation extends React.Component {
 
           <SubMenu key="audio_process" title={<span><Icon type="tool" /><span>{langmap.AudioProcess[lang]}</span></span>}>
             <Menu.Item key="audio_process_denoise">
-              {langmap.AudioProcessDenoise[lang]}
               <Link href="/denoise">
-              <a>hh</a>
+              <a>{langmap.AudioProcessDenoise[lang]}</a>
               </Link>
             </Menu.Item>
             <Menu.Item key="audio_process_bgm">
-              {langmap.AudioProcessBgm[lang]}
               <Link href="/bgm">
-              <a>hh</a>
+              <a>{langmap.AudioProcessBgm[lang]}</a>
               </Link>
             </Menu.Item>
           </SubMenu>
 
           <SubMenu key="audio_covert" title={<span><Icon type="swap" /><span>{langmap.AudioCovert[lang]}</span></span>}>
             <Menu.Item key="audio_covert_format">
-              {langmap.AudioCovertFormat[lang]}
               <Link href="/fmtcvt">
-              <a>hh</a>
+              <a>{langmap.AudioCovertFormat[lang]}</a>
               </Link>
             </Menu.Item>
           </SubMenu>
@@ -80,5 +76,11 @@ class Navigation extends React.Component {
 
 export default inject('store')(observer(Navigation));
 
-
+      //<Sider
+       //collapsible
+       //collapsed={navigation.collapsed}
+       //onCollapse={navigation.changeCollapsed}
+       //style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, }}
+      //>
+ 
 
