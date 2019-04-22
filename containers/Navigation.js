@@ -30,6 +30,7 @@ class Navigation extends React.Component {
   render() {
     const {lang, navigation} = this.props.store;
 
+    console.log("1111111111111111", navigation.nav);
     return (
       <Sider
        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, }}
@@ -38,32 +39,36 @@ class Navigation extends React.Component {
         <br/>
         <Menu
           onClick={this.handleClick}
-          defaultSelectedKeys={[navigation.nav]}
-          defaultOpenKeys={[key2OpenKey(navigation.nav)]}
+          selectedKeys={[navigation.nav]}
           theme="dark"
           mode="inline"
           >
 
-          <SubMenu key="audio_process" title={<span><Icon type="tool" /><span>{langmap.AudioProcess[lang]}</span></span>}>
-            <Menu.Item key="audio_process_denoise">
-              <Link href="/denoise">
-              <a>{langmap.AudioProcessDenoise[lang]}</a>
-              </Link>
-            </Menu.Item>
-            <Menu.Item key="audio_process_bgm">
-              <Link href="/bgm">
-              <a>{langmap.AudioProcessBgm[lang]}</a>
-              </Link>
-            </Menu.Item>
-          </SubMenu>
+          <Menu.Item key="audio_covert_format">
+            <Icon type="swap" />
+            <span>{langmap.AudioCovertFormat[lang]}</span>
+            <Link href="/fmtcvt">
+            <a>{langmap.AudioCovertFormat[lang]}</a>
+            </Link>
+          </Menu.Item>
 
-          <SubMenu key="audio_covert" title={<span><Icon type="swap" /><span>{langmap.AudioCovert[lang]}</span></span>}>
-            <Menu.Item key="audio_covert_format">
-              <Link href="/fmtcvt">
-              <a>{langmap.AudioCovertFormat[lang]}</a>
-              </Link>
-            </Menu.Item>
-          </SubMenu>
+          <Menu.Item key="audio_process_denoise">
+            <Icon type="filter" />
+            <span>{langmap.AudioProcessDenoise[lang]} </span>
+            <Link href="/denoise">
+            <a>{langmap.AudioProcessDenoise[lang]}</a>
+            </Link>
+          </Menu.Item>
+
+          <Menu.Item key="audio_process_bgm">
+            <Icon type="customer-service" />
+            <span>{langmap.AudioProcessBgm[lang]}</span>
+            <Link href="/bgm">
+            <a>{langmap.AudioProcessBgm[lang]}</a>
+            </Link>
+          </Menu.Item>
+
+
 
 
         </Menu>

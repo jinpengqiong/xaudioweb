@@ -5,7 +5,7 @@ const NavigationStore = t
   .model({
     logo: t.optional(t.string, '/static/xaudiopro_logo'),
     collapsed: t.optional(t.boolean, false),
-    nav: t.optional(t.string, 'audio_process_denoise'),  //main page, help...
+    nav: t.optional(t.string, 'audio_covert_format'),  //main page, help...
   })
   .views(self => ({
     get root() {

@@ -10,7 +10,7 @@ const RootStore = t
   .model({
     logo: t.optional(t.string, '/static/play_logo'),
     lang: t.optional(t.string, 'zh') ,
-    navigation: t.optional(NavigationStore, {nav: 'audio_process_denoise'}),
+    navigation: t.optional(NavigationStore, {nav: 'audio_covert_format'}),
     denoise: t.optional(DenoiseStore, {}),
     bgm: t.optional(BgmStore, {}),
     fmtcvt: t.optional(FmtcvtStore, {}),

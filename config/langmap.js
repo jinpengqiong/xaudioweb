@@ -7,7 +7,7 @@ const langmap = {
 
   AudioProcessDenoise: {
     'default': '',
-    'zh': '去噪',
+    'zh': '音频去噪',
     'en': 'Denoise',
   },
 
@@ -97,7 +97,7 @@ const langmap = {
 
   AudioCovertFormat: {
     'default': '',
-    'zh': '格式转换',
+    'zh': '音频转码',
     'en': 'Format Covert',
   },
 

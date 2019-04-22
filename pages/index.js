@@ -2,7 +2,7 @@ import React from 'react';
 import {Provider} from 'mobx-react';
 import initRootStore from '../stores';
 import MainPage from '../containers/MainPage';
-import DenoisePage from '../containers/DenoisePage';
+import FmtcvtPage from '../containers/FmtcvtPage';
 
 import '../static/antd-custom.less'
 
@@ -21,7 +21,7 @@ export default class XAudio extends React.Component {
   render() {
     return (
       <Provider store={this.store}>
-        <DenoisePage />
+        <FmtcvtPage/>
       </Provider>
     );
   }
