@@ -26,7 +26,7 @@ const formItemLayout = {
   labelCol: {
     xs: { span: 12 },
     sm: { span: 3 },
-    style: {"text-align": "left"}
+    style: {"textAlign": "left"}
   },
   wrapperCol: {
     xs: { span: 6 },

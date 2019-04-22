@@ -24,7 +24,6 @@ class Navigation extends React.Component {
   handleClick = e => {
     const {navigation} = this.props.store;
 
-    console.log("1111111111111111", e.key);
     navigation.setNav(e.key);
   };
 
@@ -39,11 +38,10 @@ class Navigation extends React.Component {
         <br/>
         <Menu
           onClick={this.handleClick}
-          selectedKeys={[navigation.nav]}
-          defaultOpenKeys={['audio_process']}
+          defaultSelectedKeys={[navigation.nav]}
+          defaultOpenKeys={[key2OpenKey(navigation.nav)]}
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={[navigation.nav]}
           >
 
           <SubMenu key="audio_process" title={<span><Icon type="tool" /><span>{langmap.AudioProcess[lang]}</span></span>}>
@@ -71,6 +69,15 @@ class Navigation extends React.Component {
         </Menu>
       </Sider>
     );
+  }
+}
+
+const key2OpenKey = (key) => {
+  if (key == 'audio_process_denoise' ||
+      key == 'audio_process_bgm') {
+      return 'audio_process';
+  } else if (key == 'audio_covert_format') {
+      return 'audio_covert';
   }
 }
 
