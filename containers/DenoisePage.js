@@ -67,7 +67,6 @@ class DenoisePage extends React.Component {
                     <RadioGroup onChange={denoise.onChangeMode} value={denoise.mode}>
                       <Radio style={radioStyle} value={"fft_lms_lpf"}>{langmap.DenoiseFFTLMSLPF[lang]}</Radio>
                       <WrapperRelative left={"25px"}>
-                        {langmap.DenoiseFFTLMSLPFDesc[lang]}
                         <WrapperRelative top={"20px"}>
                           <Form >
                             <Form.Item {...formItemLayout} label={langmap.DenoiseGain[lang] }>
@@ -78,11 +77,13 @@ class DenoisePage extends React.Component {
                             </Form.Item>
                           </Form>
                         </WrapperRelative>
+                        <br/>
+                        <br/>
+                        {langmap.DenoiseFFTLMSLPFDesc[lang]}
                       </WrapperRelative>
                       <Divider />
                       <Radio style={radioStyle} value={"fft_lms"}>{langmap.DenoiseFFTLMS[lang]}</Radio>
                       <WrapperRelative left={"25px"}>
-                        {langmap.DenoiseFFTLMSDesc[lang]}
                         <WrapperRelative top={"20px"}>
                           <Form >
                             <Form.Item {...formItemLayout} label={langmap.DenoiseGain[lang] }>
@@ -90,6 +91,9 @@ class DenoisePage extends React.Component {
                             </Form.Item>
                           </Form>
                         </WrapperRelative>
+                        <br/>
+                        <br/>
+                        {langmap.DenoiseFFTLMSDesc[lang]}
                       </WrapperRelative>
                       <Divider />
                       <Radio style={radioStyle} value={"rnn"}>{langmap.DenoiseRNN[lang]}</Radio>

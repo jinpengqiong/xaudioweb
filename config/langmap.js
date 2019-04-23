@@ -1,7 +1,7 @@
 const langmap = {
   CommonTip: {
     'default': '',
-    'zh': '请使用高版本的 Chrome/FireFox/Safari 现代浏览器, 本站采用H5/Webassembly技术, 在浏览器中高效直接运行处理, 拥有与本地软件一致的体验!',
+    'zh': '请使用高版本的 Chrome/FireFox/Safari 现代浏览器, 本站采用H5/WebAssembly技术, 在浏览器中高效直接运行处理, 拥有与本地软件一致的体验!',
     'en': 'Audio Process',
   },
 
@@ -25,7 +25,7 @@ const langmap = {
 
   DenoiseRNNDesc: {
     'default': '',
-    'zh': '采用RNN AI学习算法自适应去除语音人声背景噪声;  对会议背景器械声, 白噪声, hiss噪声等噪声效果较好; 不适用于音乐去噪，切忌对音乐背景去噪',
+    'zh': '适用说明: 采用RNN AI学习算法自适应去除语音人声背景噪声;  对会议背景器械声, 白噪声, hiss噪声等噪声效果较好; 不适用于音乐去噪，切忌对音乐背景去噪',
     'en': 'RNN Denoise',
   },
 
@@ -37,7 +37,7 @@ const langmap = {
 
   DenoiseFFTLMSDesc: {
     'default': '',
-    'zh': '同谱减去噪1, 只是不进行低通滤波, 频域成份保留更完整',
+    'zh': '适用说明: 同谱减去噪1, 只是不进行低通滤波, 频域成份保留更完整',
     'en': 'Spectrum Denoise',
   },
 
@@ -49,7 +49,7 @@ const langmap = {
 
   DenoiseFFTLMSLPFDesc: {
     'default': '',
-    'zh': '谱减去噪,并滤除高频噪声. 适用于白噪声/hiss噪声的场景; 增加增益值加强谱减程度, 降低截止系数去除更多高频噪声',
+    'zh': '适用说明: 谱减去噪,并滤除高频噪声. 适用于白噪声/hiss噪声的场景; 增加增益值加强谱减程度, 降低截止系数去除更多高频噪声',
     'en': 'Spectrum Denoise',
   },
 
