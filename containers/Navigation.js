@@ -36,7 +36,6 @@ class Navigation extends React.Component {
        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, }}
       >
         <HeaderLogo2 backgroundImage={navigation.logo} />
-        <br/>
         <Menu
           onClick={this.handleClick}
           selectedKeys={[navigation.nav]}

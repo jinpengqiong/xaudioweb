@@ -1,4 +1,10 @@
 const langmap = {
+  CommonTip: {
+    'default': '',
+    'zh': '请使用高版本的 Chrome/FireFox/Safari 现代浏览器, 本站采用H5/Webassembly技术, 在浏览器中高效直接运行处理, 拥有与本地软件一致的体验!',
+    'en': 'Audio Process',
+  },
+
   AudioProcess: {
     'default': '',
     'zh': '音频处理',
@@ -143,6 +149,11 @@ const langmap = {
     'en': 'Recommend',
   },
 
+  UploadProcess: {
+    'default': '',
+    'zh': '上传处理',
+    'en': 'Upload Process',
+  },
 
 
 

@@ -8,7 +8,7 @@ import {Layout, Row, Col, Select, Input, Progress,
         Button, Upload, Icon, Slider, Switch, Alert,
         Form, Divider} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
-import {CommonHeader, CommonFooter} from './CommonHeaderFooter';
+import {CommonHeader, CommonFooter, CommonNoteTip} from './CommonHeaderFooter';
 
 import Navigation from './Navigation';
 import langmap from '../config/langmap';
@@ -145,6 +145,9 @@ class FmtcvtPage extends React.Component {
           <Layout style={{ marginLeft: 200 }}>
             <CommonHeader/>
             <Content>
+              <Row>
+                <CommonNoteTip lang={lang}/>
+              </Row>
               <WrapperRelative top={"30px"}>
                 <Row>
                   <Col span={30} offset={1}>
@@ -175,7 +178,7 @@ class FmtcvtPage extends React.Component {
                        showUploadList={false}
                        >
                         <Button>
-                          <Icon type="upload"/> {"upload"} 
+                          <Icon type="upload"/> {langmap.UploadProcess[lang]} 
                         </Button>
                       </Upload>
                       <div>{fmtcvt.fileName} </div>

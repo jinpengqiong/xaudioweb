@@ -1,11 +1,29 @@
-import {Layout} from 'antd';
+import {Alert, Layout} from 'antd';
 
-const {Header, Footer} = Layout;
+const {Row, Col, Header, Footer} = Layout;
+
+import {Margin} from '../components/BaseStyle';
+import langmap from '../config/langmap';
+
 
 function CommonHeader() {
   return (
-    <Header style={{ background: 'black', padding: 0 }} />
+    <Header style={{ background: '#001528', padding: 0 }} >
+      <Margin left='18px'>
+        <font color="white" size="4">
+        XAudioPro
+        </font>
+      </Margin>
+    </Header>
   );
+}
+
+function CommonNoteTip({lang}) {
+  return (
+    <Margin left='0px' right='0px' top='0px' bottom='10px'>
+      <Alert banner showIcon={true} message={langmap.CommonTip[lang]} type='info'/>  
+    </Margin>
+  )
 }
 
 function CommonFooter() {
@@ -17,4 +35,4 @@ function CommonFooter() {
 }
 
 
-export {CommonHeader, CommonFooter};
+export {CommonHeader, CommonFooter, CommonNoteTip};
