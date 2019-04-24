@@ -34,6 +34,18 @@ const formItemLayout = {
   },
 };
 
+const DescriptionFont = ({desc}) => {
+  return (
+    <div>
+      <br/>
+      <br/>
+      <font color="#9e9e9e" size="1" style={{fontStyle: "italic"}}>
+        {desc}
+      </font>
+    </div>
+  );
+};
+
 
 class DenoisePage extends React.Component {
 
@@ -41,6 +53,8 @@ class DenoisePage extends React.Component {
   }
 
   componentDidMount() {
+    const {navigation} = this.props.store;
+    navigation.setNav('audio_process_denoise');
   }
 
   componentWillUnmount() {}
@@ -77,9 +91,7 @@ class DenoisePage extends React.Component {
                             </Form.Item>
                           </Form>
                         </WrapperRelative>
-                        <br/>
-                        <br/>
-                        {langmap.DenoiseFFTLMSLPFDesc[lang]}
+                        <DescriptionFont desc={langmap.DenoiseFFTLMSLPFDesc[lang]}/>
                       </WrapperRelative>
                       <Divider />
                       <Radio style={radioStyle} value={"fft_lms"}>{langmap.DenoiseFFTLMS[lang]}</Radio>
@@ -91,12 +103,14 @@ class DenoisePage extends React.Component {
                             </Form.Item>
                           </Form>
                         </WrapperRelative>
-                        <br/>
-                        <br/>
-                        {langmap.DenoiseFFTLMSDesc[lang]}
+                        <DescriptionFont desc={langmap.DenoiseFFTLMSDesc[lang]}/>
                       </WrapperRelative>
                       <Divider />
                       <Radio style={radioStyle} value={"rnn"}>{langmap.DenoiseRNN[lang]}</Radio>
+                      <WrapperRelative left={"25px"}>
+                        <DescriptionFont desc={langmap.DenoiseRNNDesc[lang]}/>
+                      </WrapperRelative>
+
                     </RadioGroup>
                     <Divider />
                     <br/>

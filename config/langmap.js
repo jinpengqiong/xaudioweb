@@ -31,25 +31,25 @@ const langmap = {
 
   DenoiseFFTLMS: {
     'default': '',
-    'zh': '频域谱减去噪2',
+    'zh': '谱减去噪',
     'en': 'Spectrum Denoise',
   },
 
   DenoiseFFTLMSDesc: {
     'default': '',
-    'zh': '适用说明: 同谱减去噪1, 只是不进行低通滤波, 频域成份保留更完整',
+    'zh': '适用说明: 一般频域谱减去噪, 不进行低通滤波, 频域成份保留更完整',
     'en': 'Spectrum Denoise',
   },
 
   DenoiseFFTLMSLPF: {
     'default': '',
-    'zh': '频域谱减去噪1',
+    'zh': '谱减低通滤波去噪',
     'en': 'Spectrum Denoise',
   },
 
   DenoiseFFTLMSLPFDesc: {
     'default': '',
-    'zh': '适用说明: 谱减去噪,并滤除高频噪声. 适用于白噪声/hiss噪声的场景; 增加增益值加强谱减程度, 降低截止系数去除更多高频噪声',
+    'zh': "适用说明: 频域谱减去噪,同时滤除高频噪声. 适用于白噪声/hiss噪声; 增加增益值加强谱减程度, 降低截止系数去除更多高频噪声",
     'en': 'Spectrum Denoise',
   },
 
@@ -92,6 +92,12 @@ const langmap = {
   AudioProcessBgm: {
     'default': '',
     'zh': '提取伴奏',
+    'en': 'Extract BGM',
+  },
+
+  BgmNote: {
+    'default': '',
+    'zh': '请输入立体声的wav文件,如若是其它格式(mp3/aac..)请先进行音频转码为wav后进行伴奏提取',
     'en': 'Extract BGM',
   },
 

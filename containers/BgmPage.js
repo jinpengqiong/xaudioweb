@@ -41,6 +41,8 @@ class BgmPage extends React.Component {
   }
 
   componentDidMount() {
+    const {navigation} = this.props.store;
+    navigation.setNav('audio_process_bgm');
   }
 
   componentWillUnmount() {}
@@ -62,6 +64,12 @@ class BgmPage extends React.Component {
                 <CommonNoteTip lang={lang}/>
               </Row>
               <WrapperRelative top={"30px"}>
+                <Row>
+                  <Col span={30} offset={1}>
+                    {langmap.BgmNote[lang]}
+                  </Col>
+                </Row>
+                <br/>
                 <Row>
                   <Col span={30} offset={1}>
                     <Col span={20}>
