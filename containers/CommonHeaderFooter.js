@@ -8,7 +8,7 @@ import langmap from '../config/langmap';
 
 function CommonHeader() {
   return (
-    <Header style={{ background: '#001528', padding: 0 }} >
+    <Header style={{ background: '#001528', padding: 0, position: "fixed", zIndex: 1, width: '100%' }} >
       <Margin left='18px'>
         <font color="white" size="4">
         XAudioPro
