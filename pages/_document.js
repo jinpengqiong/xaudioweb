@@ -14,6 +14,7 @@ export default class MyDocument extends Document {
         <Head>
           <title>管理后台</title>
           <script src="/static/download.js"> </script>
+          <script src="/static/baidu.js"> </script>
           {styleTags}
         </Head>
         <body>
