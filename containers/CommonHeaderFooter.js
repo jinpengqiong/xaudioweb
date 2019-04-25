@@ -20,7 +20,7 @@ function CommonHeader() {
 
 function CommonNoteTip({lang}) {
   return (
-    <Margin left='0px' right='0px' top='0px' bottom='10px'>
+    <Margin left='0px' right='0px' top='65px' bottom='10px'>
       <Alert banner showIcon={true} message={langmap.CommonTip[lang]} type='info'/>  
     </Margin>
   )

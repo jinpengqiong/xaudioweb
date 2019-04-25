@@ -43,6 +43,14 @@ const FmtcvtStore = t
       return '48';
     },
 
+    get wmaBitrateList() {
+      return ['32', '64', '96', '112', '128', '160', '192'];
+    },
+
+    get wmaDefaultBitrate() {
+      return '128';
+    },
+
     get defaultBitrate() {
       switch (self.fmt) {
         case 'mp3':
@@ -51,6 +59,8 @@ const FmtcvtStore = t
           return self.aacDefaultBitrate;
         case 'm4a':
           return self.aacDefaultBitrate;
+        case 'wma':
+          return self.wmaDefaultBitrate;
       }
     },
 
@@ -115,6 +125,10 @@ const toFFmpegArgs = (fmt, samplerate, channel, bitrate) => {
       //user aac_low
       return ["-c:a", "libfdk_aac", "-ar", samplerateString(samplerate), "-ac", channel, "-profile:a", "aac_low", "-b:a", bitrate+"k"]
     }
+  } else if (fmt == 'wma') {
+      return ["-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
+  } else if (fmt == 'wav') {
+      return ["-ar", samplerateString(samplerate), "-ac", channel]
   }
 }
 
@@ -125,6 +139,10 @@ const toFFmpegFmtName = (fmt) => {
     return 'adts';
   } else if (fmt == 'm4a') {
     return 'm4a';
+  } else if (fmt == 'wav') {
+    return 'wav';
+  } else if (fmt == 'wma') {
+    return 'wma';
   }
 }
 

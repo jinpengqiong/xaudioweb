@@ -161,12 +161,20 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
 
     //console.log(arrayBuffer.byteLength);
     //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
-    worker.postMessage({
-      type: "run", 
-      MEMFS: [{name: inputFileName, data: arrayBuffer}],
-      arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-f", outputFmt, "out.aac"]),
-    });
 
+    if (outputFmt != 'wma') {
+      worker.postMessage({
+        type: "run", 
+        MEMFS: [{name: inputFileName, data: arrayBuffer}],
+        arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-f", outputFmt, outputFileName]),
+      });
+    } else {
+      worker.postMessage({
+        type: "run", 
+        MEMFS: [{name: inputFileName, data: arrayBuffer}],
+        arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-acodec", "wmav2", outputFileName]),
+      });
+    }
   };
   reader.readAsArrayBuffer(file);
 

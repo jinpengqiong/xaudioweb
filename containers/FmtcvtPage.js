@@ -77,6 +77,13 @@ const bitrateName = (lang, bitrate, defaultBitrate) => {
   }
 }
 
+const isWav = (fmt) => {
+  if (fmt == 'wav')
+    return true;
+  else 
+    return false;
+}
+
 const BitrateOptions = ({...fmtcvtConfig}) => { 
   let list = [];
   let bitrateList, defaultBitrate, handleChange;
@@ -87,8 +94,17 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
       defaultBitrate = fmtcvtConfig.mp3DefaultBitrate;
       break;
     case 'aac':
+    case 'm4a':
       bitrateList = fmtcvtConfig.aacBitrateList;
       defaultBitrate = fmtcvtConfig.aacDefaultBitrate;
+      break;
+    case 'wma':
+      bitrateList = fmtcvtConfig.wmaBitrateList;
+      defaultBitrate = fmtcvtConfig.wmaDefaultBitrate;
+      break;
+    case 'wav':
+      bitrateList = [];
+      defaultBitrate = '';
       break;
   }
 
@@ -98,7 +114,7 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
               </Option>)
   }
 
-  return (<Select value={fmtcvtConfig.bitrate}  onChange={fmtcvtConfig.changeBitrate}>
+  return (<Select value={fmtcvtConfig.bitrate}  onChange={fmtcvtConfig.changeBitrate} disabled={isWav(fmtcvtConfig.fmt)}>
           {list}
          </Select>)
 };
@@ -133,6 +149,8 @@ class FmtcvtPage extends React.Component {
       mp3DefaultBitrate: fmtcvt.mp3DefaultBitrate,
       aacBitrateList: fmtcvt.aacBitrateList,
       aacDefaultBitrate: fmtcvt.aacDefaultBitrate,
+      wmaBitrateList: fmtcvt.wmaBitrateList,
+      wmaDefaultBitrate: fmtcvt.wmaDefaultBitrate,
 
       changeFmt: fmtcvt.changeFmt,
       changeBitrate: fmtcvt.changeBitrate
