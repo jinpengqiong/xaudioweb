@@ -137,7 +137,9 @@ export function downFile(data, fileName) {
 let gFFmpegDuration = 0;
 let gFFmpegProgress = 0;
 
-export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputPrefix, outputFmtName, outputFmt) {
+let gError = 0;
+
+export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputPrefix, fmt, outputFmtName, outputFmtCvt) {
 
   let worker = new Worker(workerPath);
 
@@ -159,22 +161,28 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
     gFFmpegDuration = 0;
     gFFmpegProgress = 0;
 
+    gError = 0;
+
     //console.log(arrayBuffer.byteLength);
     //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
 
-    if (outputFmt != 'wma') {
+    if (fmt == 'mp3' || 
+        fmt == 'aac' ||
+        fmt == 'm4a' ||
+        fmt == 'ogg(opus)' ||
+        fmt == 'wav') {
       worker.postMessage({
         type: "run", 
         MEMFS: [{name: inputFileName, data: arrayBuffer}],
-        arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-f", outputFmt, outputFileName]),
+        arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-f", outputFmtCvt, outputFileName]),
       });
-    } else {
+    } else if (fmt == 'wma'){
       worker.postMessage({
         type: "run", 
         MEMFS: [{name: inputFileName, data: arrayBuffer}],
         arguments: ["-y", "-i", inputFileName].concat(workerArgs).concat(["-acodec", "wmav2", outputFileName]),
       });
-    }
+    };
   };
   reader.readAsArrayBuffer(file);
 
@@ -186,24 +194,18 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
         selfEnv.setProgress(0);
         break;
       case "stdout":
-        console.log("===========> data=", msg.data);
-        //let p = parseProgress(fileSize, msg.data);
-        //if (p >= 0) {
-          //if (pp != p) {
-            //console.log("===========> progress=", self.progress);
-            //selfEnv.setProgress(p);
-            //pp = p;
-          //}
-        //}
-        break;
       case "stderr":
-        console.log("===========> data=", msg.data);
+        console.log("===========> out, err data=", msg.data);
+        if (checkError(msg.data)) {
+          gError = 1;
+          selfEnv.setError(msg.data);
+        } else {
+          let tmpProgress = parseFFmpegProgress(gFFmpegDuration, gFFmpegProgress, msg.data);
+          gFFmpegDuration = tmpProgress.duration;
+          gFFmpegProgress = tmpProgress.progress;
 
-        let tmpProgress = parseFFmpegProgress(gFFmpegDuration, gFFmpegProgress, msg.data);
-        gFFmpegDuration = tmpProgress.duration;
-        gFFmpegProgress = tmpProgress.progress;
-
-        selfEnv.setProgress(gFFmpegProgress);
+          selfEnv.setProgress(gFFmpegProgress);
+        }
 
         break;
       case "exit":
@@ -213,7 +215,8 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
       case "done":
         selfEnv.setProgress(100);
         //console.log("44444444444444: ", msg.data);
-        downFile(msg.data, outputFileName);
+        if (!gError)
+          downFile(msg.data, outputFileName);
         break;
     }
   };
@@ -281,6 +284,7 @@ export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPr
         selfEnv.setProgress(100);
         //console.log("44444444444444: ", msg.data);
         downFile(msg.data, outputFileName);
+
         break;
     }
   };
@@ -340,6 +344,18 @@ const parseProgress = (fileSize, info) => {
   }
 
   return p;
+}
+
+const checkError = (info) => {
+  let result = false;
+
+  if (info.indexOf("Conversion failed!") >= 0) {
+    result = true;
+  } else {
+    result = false;
+  }
+
+  return result;
 }
 
 

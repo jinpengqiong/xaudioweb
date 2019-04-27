@@ -12,7 +12,7 @@ export default class MyDocument extends Document {
     return (
       <html>
         <Head>
-          <title>管理后台</title>
+          <title>剪音网</title>
           <script src="/static/download.js"> </script>
           <script src="/static/baidu.js"> </script>
 

@@ -98,6 +98,10 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
       bitrateList = fmtcvtConfig.aacBitrateList;
       defaultBitrate = fmtcvtConfig.aacDefaultBitrate;
       break;
+    case 'ogg(opus)':
+      bitrateList = fmtcvtConfig.oggopusBitrateList;
+      defaultBitrate = fmtcvtConfig.oggopusDefaultBitrate;
+      break;
     case 'wma':
       bitrateList = fmtcvtConfig.wmaBitrateList;
       defaultBitrate = fmtcvtConfig.wmaDefaultBitrate;
@@ -149,11 +153,15 @@ class FmtcvtPage extends React.Component {
       mp3DefaultBitrate: fmtcvt.mp3DefaultBitrate,
       aacBitrateList: fmtcvt.aacBitrateList,
       aacDefaultBitrate: fmtcvt.aacDefaultBitrate,
+      oggopusBitrateList: fmtcvt.oggopusBitrateList,
+      oggopusDefaultBitrate: fmtcvt.oggopusDefaultBitrate,
       wmaBitrateList: fmtcvt.wmaBitrateList,
       wmaDefaultBitrate: fmtcvt.wmaDefaultBitrate,
 
       changeFmt: fmtcvt.changeFmt,
-      changeBitrate: fmtcvt.changeBitrate
+      changeBitrate: fmtcvt.changeBitrate,
+      changeSamplerate: fmtcvt.changeSamplerate,
+      changeChannel: fmtcvt.changeChannel,
     };
 
     return (
