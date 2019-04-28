@@ -88,8 +88,8 @@ const bitrateName = (lang, bitrate, defaultBitrate) => {
   }
 }
 
-const isWav = (fmt) => {
-  if (fmt == 'wav')
+const disableBitrate = (fmt) => {
+  if (fmt == 'wav' || fmt == 'flac')
     return true;
   else 
     return false;
@@ -126,6 +126,7 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
       defaultBitrate = fmtcvtConfig.ac3DefaultBitrate;
       break;
     case 'wav':
+    case 'flac':
       bitrateList = [];
       defaultBitrate = '';
       break;
@@ -137,7 +138,7 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
               </Option>)
   }
 
-  return (<Select value={fmtcvtConfig.bitrate}  onChange={fmtcvtConfig.changeBitrate} disabled={isWav(fmtcvtConfig.fmt)}>
+  return (<Select value={fmtcvtConfig.bitrate}  onChange={fmtcvtConfig.changeBitrate} disabled={disableBitrate(fmtcvtConfig.fmt)}>
           {list}
          </Select>)
 };

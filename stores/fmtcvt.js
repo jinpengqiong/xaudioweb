@@ -19,7 +19,7 @@ const FmtcvtStore = t
     },
 
     get fmtList() {
-      return ['aac', 'm4a', 'mp3', 'ogg(opus)', 'opus', 'wma', 'ac3', 'wav'];
+      return ['aac', 'm4a', 'mp3', 'ogg(opus)', 'opus', 'wma', 'ac3', 'flac', 'wav'];
     },
 
     get defaultFmt() {
@@ -198,7 +198,7 @@ const toFFmpegArgs = (fmt, samplerate, channel, bitrate) => {
       return ["-acodec", "wmav2", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
   } else if (fmt == 'ac3') {
       return ["-acodec", "ac3", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
-  } else if (fmt == 'wav') {
+  } else if (fmt == 'wav' || fmt == 'flac') {
       return ["-ar", samplerateString(samplerate), "-ac", channel]
   }
 }
