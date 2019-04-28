@@ -208,10 +208,12 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
       case "exit":
         //console.log(stdout);
         selfEnv.setProcessing(false);
+        selfEnv.setLoading(false);
         worker.terminate();
         break;
       case "done":
         selfEnv.setProgress(100);
+        selfEnv.setLoading(false);
         selfEnv.setProcessing(false);
         //console.log("44444444444444: ", msg.data);
         if (!gError)
@@ -278,11 +280,13 @@ export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPr
         break;
       case "exit":
         //console.log(stdout);
+        selfEnv.setLoading(false);
         selfEnv.setProcessing(false);
         worker.terminate();
         break;
       case "done":
         selfEnv.setProgress(100);
+        selfEnv.setLoading(false);
         selfEnv.setProcessing(false);
         //console.log("44444444444444: ", msg.data);
         downFile(msg.data, outputFileName);
