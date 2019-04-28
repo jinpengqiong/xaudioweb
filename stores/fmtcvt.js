@@ -30,6 +30,10 @@ const FmtcvtStore = t
       return ['16', '32', '44.1', '48'];
     },
 
+    get oggopusSamplerateList() {
+      return ['24', '48'];
+    },
+
     get mp3BitrateList() {
       return ['32', '64', '96', '112', '128', '160', '192', '256', '320'];
     },

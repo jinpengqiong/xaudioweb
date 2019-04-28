@@ -50,6 +50,13 @@ const OutputFormatOptions = ({...fmtcvtConfig}) => {
 
 const SamplerateOptions = ({...fmtcvtConfig}) => { 
   let list = [];
+  let samplerateList;
+
+  if (fmtcvtConfig.fmt == 'ogg(opus)') {
+    samplerateList = fmtcvtConfig.oggopusSamplerateList;
+  } else {
+    samplerateList = fmtcvtConfig.samplerateList;
+  }
 
   for(let i = 0; i < fmtcvtConfig.samplerateList.length; i++) {
     list.push(<Option key={'samplerate'+i.toString()} value={fmtcvtConfig.samplerateList[i]}>{fmtcvtConfig.samplerateList[i] + ' kHz'}</Option>)
@@ -148,7 +155,10 @@ class FmtcvtPage extends React.Component {
 
       fmtList: fmtcvt.fmtList,
       defaultFmt: fmtcvt.defaultFmt,
+
       samplerateList: fmtcvt.samplerateList,
+      oggopusSamplerateList: fmtcvt.oggopusSamplerateList,
+
       mp3BitrateList: fmtcvt.mp3BitrateList,
       mp3DefaultBitrate: fmtcvt.mp3DefaultBitrate,
       aacBitrateList: fmtcvt.aacBitrateList,
