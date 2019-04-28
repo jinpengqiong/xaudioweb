@@ -203,6 +203,8 @@ const toFFmpegFmtCvt = (fmt) => {
     return 'ogg';
   } else if (fmt == 'wma' || fmt == 'opus') {
     return '';
+  } else {
+    return fmt;
   }
 }
 

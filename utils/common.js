@@ -163,9 +163,6 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
 
     gError = 0;
 
-    //console.log(arrayBuffer.byteLength);
-    //console.log("00000000000000000000-----------", self.mode, " jj: ", parseMode(self.mode));
-
     if (outputFmtCvt != "") {
       worker.postMessage({
         type: "run", 
