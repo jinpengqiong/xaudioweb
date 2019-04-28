@@ -47,6 +47,7 @@ const DescriptionFont = ({desc}) => {
 };
 
 
+
 class DenoisePage extends React.Component {
 
   componentWillMount() {

@@ -30,7 +30,7 @@ class Navigation extends React.Component {
   render() {
     const {lang, navigation} = this.props.store;
 
-    console.log("1111111111111111", navigation.nav);
+    //console.log("1111111111111111", navigation.nav);
     return (
       <Sider
        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, }}

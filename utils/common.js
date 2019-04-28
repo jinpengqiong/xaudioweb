@@ -183,12 +183,12 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
     var msg = e.data;
     switch (msg.type) {
       case "ready":
-        console.log("=======================> is ready");
+        //console.log("=======================> is ready");
         selfEnv.setProgress(0);
         break;
       case "stdout":
       case "stderr":
-        console.log("===========> out, err data=", msg.data);
+        //console.log("===========> out, err data=", msg.data);
         if (checkError(msg.data)) {
           gError = 1;
           selfEnv.setError(msg.data);
@@ -202,7 +202,7 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
 
         break;
       case "exit":
-        //console.log(stdout);
+        console.log(stdout);
         worker.terminate();
         break;
       case "done":

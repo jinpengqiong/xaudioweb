@@ -1,5 +1,47 @@
 import {types as t, flow, getParent} from 'mobx-state-tree';
 import { processFFmpegFile } from '../utils/common';
+import {message} from 'antd';
+
+const checkValidAudioFile = (file) => {
+
+  let isValidType = (file.type === 'audio/wav') ||
+                    (file.type === 'audio/x-wav') ||
+                    (file.type === 'audio/mp3') ||
+                    (file.type === 'audio/mp4') ||
+                    (file.type === 'audio/mpeg') ||
+                    (file.type === 'audio/aac') ||
+                    (file.type === 'audio/aac-adts') ||
+                    (file.type === 'audio/x-matroska') ||
+                    (file.type === 'application/ogg') ||
+                    (file.type === 'audio/ogg') ||
+                    (file.type === 'audio/x-m4a') ||
+                    (file.type === 'audio/ac3') ||
+                    (file.type === 'audio/x-ms-wma') ||
+                    (file.type === 'video/x-ms-wma') ||
+                    (file.type === 'audio/flac');
+
+  let fileName = file.name;
+
+  let inputFileName = file.name;
+  let tmpName = inputFileName.split(".");
+  let suffix = tmpName[tmpName.length-1];
+
+  //console.log("rrrrrrrrrrrr: ", suffix);
+
+  let isValidSuffix = (suffix == "wav") ||
+                      (suffix == "ape") ||
+                      (suffix == "mp3") ||
+                      (suffix == "aac") ||
+                      (suffix == "m4a") ||
+                      (suffix == "ac3") ||
+                      (suffix == "ogg") ||
+                      (suffix == "opus") ||
+                      (suffix == "wma") ||
+                      (suffix == "flac");
+
+  return isValidType || isValidSuffix;
+
+}
 
 const FmtcvtStore = t
   .model({
@@ -158,6 +200,12 @@ const FmtcvtStore = t
 
     openFile(file) {
       self.resetErr();
+
+      if (!checkValidAudioFile(file)) {
+        message.error("Not wav|flac|ape|mp4|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma file!");
+        return false;
+      }
+
       return processFFmpegFile(self, file, "../static/ffmpegaudio.worker.js", 
                                toFFmpegArgs(self.fmt, self.samplerate, self.channel, self.bitrate), 
                                "fmtcvt-", 

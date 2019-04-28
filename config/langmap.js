@@ -113,6 +113,12 @@ const langmap = {
     'en': 'Format Covert',
   },
 
+  AudioCovertInputSupport: {
+    'default': '',
+    'zh': '支持的输入格式(wav|flac|ape|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma)',
+    'en': 'Support input format (wav|flac|ape|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma)',
+  },
+
   OutputFormat: {
     'default': '',
     'zh': '输出格式',

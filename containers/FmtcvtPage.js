@@ -205,6 +205,12 @@ class FmtcvtPage extends React.Component {
               <Row>
                 <CommonNoteTip lang={lang}/>
               </Row>
+              <Row>
+                <Col span={30} offset={1}>
+                {langmap.AudioCovertInputSupport[lang]}
+                </Col>
+              </Row>
+
               <WrapperRelative top={"30px"}>
                 <Row>
                   <Col span={30} offset={1}>

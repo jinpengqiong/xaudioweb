@@ -20,7 +20,7 @@ const NavigationStore = t
 
     changeCollapsed() {
       self.collapsed = !self.collapsed;
-      console.log("1111111111111", self.collapsed);
+      //console.log("1111111111111", self.collapsed);
     },
 
   }));

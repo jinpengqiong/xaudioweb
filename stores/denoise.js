@@ -1,5 +1,6 @@
 import {types as t, flow, getParent} from 'mobx-state-tree';
 import { processAudioFile } from '../utils/common';
+import {message} from 'antd';
 
 const DenoiseStore = t
   .model({
@@ -29,6 +30,13 @@ const DenoiseStore = t
     },
 
     openFile(file) {
+      //console.log("1111111111111111111", file.type);
+      const isWav = (file.type === 'audio/wav');
+      if (!isWav) {
+        message.error("Not wav file!");
+        return false;
+      }
+
       return processAudioFile(self, file, "../static/xadenoise.worker.js", ["-t", parseMode(self.mode)], "denoise-");
     },
 

@@ -1,5 +1,6 @@
 import {types as t, flow, getParent} from 'mobx-state-tree';
 import { processAudioFile } from '../utils/common';
+import {message} from 'antd';
 
 const BgmStore = t
   .model({
@@ -23,6 +24,12 @@ const BgmStore = t
     },
 
     openFile(file) {
+      const isWav = (file.type === 'audio/wav');
+      if (!isWav) {
+        message.error("Not wav file!");
+        return false;
+      }
+
       return processAudioFile(self, file, "../static/xabgm.worker.js", [], "bgm-");
     },
 
