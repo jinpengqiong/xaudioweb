@@ -5,8 +5,8 @@ const FmtcvtStore = t
   .model({
     fileName: t.optional(t.string, ''),
     progress: t.optional(t.number, 0),
-    fmt: t.optional(t.string, 'mp3'),
-    bitrate: t.optional(t.string, '128'),
+    fmt: t.optional(t.string, 'aac'),
+    bitrate: t.optional(t.string, '48'),
     samplerate: t.optional(t.string, '44.1'),
     channel: t.optional(t.string, '2'),
 
@@ -19,11 +19,11 @@ const FmtcvtStore = t
     },
 
     get fmtList() {
-      return ['mp3', 'aac', 'm4a', 'ogg(opus)', 'opus', 'wma', 'wav'];
+      return ['aac', 'm4a', 'mp3', 'ogg(opus)', 'opus', 'wma', 'ac3', 'wav'];
     },
 
     get defaultFmt() {
-      return 'mp3';
+      return 'aac';
     },
 
     get samplerateList() {
@@ -36,6 +36,10 @@ const FmtcvtStore = t
 
     get opusSamplerateList() {
       return ['48'];
+    },
+
+    get ac3SamplerateList() {
+      return ['32', '44.1', '48'];
     },
 
     get mp3BitrateList() {
@@ -78,6 +82,14 @@ const FmtcvtStore = t
       return '128';
     },
 
+    get ac3BitrateList() {
+      return ['96', '112', '128', '160', '192', '256', '320', '640'];
+    },
+
+    get ac3DefaultBitrate() {
+      return '192';
+    },
+
     get defaultBitrate() {
       switch (self.fmt) {
         case 'mp3':
@@ -92,6 +104,8 @@ const FmtcvtStore = t
           return self.oggopusDefaultBitrate;
         case 'opus':
           return self.opusDefaultBitrate;
+        case 'ac3':
+          return self.ac3DefaultBitrate;
       }
     },
 
@@ -182,6 +196,8 @@ const toFFmpegArgs = (fmt, samplerate, channel, bitrate) => {
       return ["-c:a", "libopus", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k", "-vbr", "on", "-compression_level", "10"]
   } else if (fmt == 'wma') {
       return ["-acodec", "wmav2", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
+  } else if (fmt == 'ac3') {
+      return ["-acodec", "ac3", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
   } else if (fmt == 'wav') {
       return ["-ar", samplerateString(samplerate), "-ac", channel]
   }

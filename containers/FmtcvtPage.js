@@ -56,6 +56,8 @@ const SamplerateOptions = ({...fmtcvtConfig}) => {
     samplerateList = fmtcvtConfig.oggopusSamplerateList;
   } else if (fmtcvtConfig.fmt == 'opus') {
     samplerateList = fmtcvtConfig.opusSamplerateList;
+  } else if (fmtcvtConfig.fmt == 'ac3') {
+    samplerateList = fmtcvtConfig.ac3SamplerateList;
   } else {
     samplerateList = fmtcvtConfig.samplerateList;
   }
@@ -119,6 +121,10 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
       bitrateList = fmtcvtConfig.wmaBitrateList;
       defaultBitrate = fmtcvtConfig.wmaDefaultBitrate;
       break;
+    case 'ac3':
+      bitrateList = fmtcvtConfig.ac3BitrateList;
+      defaultBitrate = fmtcvtConfig.ac3DefaultBitrate;
+      break;
     case 'wav':
       bitrateList = [];
       defaultBitrate = '';
@@ -165,6 +171,7 @@ class FmtcvtPage extends React.Component {
       samplerateList: fmtcvt.samplerateList,
       oggopusSamplerateList: fmtcvt.oggopusSamplerateList,
       opusSamplerateList: fmtcvt.opusSamplerateList,
+      ac3SamplerateList: fmtcvt.ac3SamplerateList,
 
       mp3BitrateList: fmtcvt.mp3BitrateList,
       mp3DefaultBitrate: fmtcvt.mp3DefaultBitrate,
@@ -176,6 +183,8 @@ class FmtcvtPage extends React.Component {
       opusDefaultBitrate: fmtcvt.opusDefaultBitrate,
       wmaBitrateList: fmtcvt.wmaBitrateList,
       wmaDefaultBitrate: fmtcvt.wmaDefaultBitrate,
+      ac3BitrateList: fmtcvt.ac3BitrateList,
+      ac3DefaultBitrate: fmtcvt.ac3DefaultBitrate,
 
       changeFmt: fmtcvt.changeFmt,
       changeBitrate: fmtcvt.changeBitrate,
