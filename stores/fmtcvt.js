@@ -19,7 +19,7 @@ const FmtcvtStore = t
     },
 
     get fmtList() {
-      return ['mp3', 'aac', 'm4a', 'ogg(opus)', 'wma', 'wav'];
+      return ['mp3', 'aac', 'm4a', 'ogg(opus)', 'opus', 'wma', 'wav'];
     },
 
     get defaultFmt() {
@@ -31,7 +31,11 @@ const FmtcvtStore = t
     },
 
     get oggopusSamplerateList() {
-      return ['24', '48'];
+      return ['48'];
+    },
+
+    get opusSamplerateList() {
+      return ['48'];
     },
 
     get mp3BitrateList() {
@@ -51,11 +55,19 @@ const FmtcvtStore = t
     },
 
     get oggopusBitrateList() {
-      return ['24', '32', '48', '64', '96', '112', '128', '160', '192', '256', '320', '510'];
+      return ['48', '64', '96', '112', '128', '160', '192', '256', '320', '510'];
     },
 
     get oggopusDefaultBitrate() {
-      return '64';
+      return '96';
+    },
+
+    get opusBitrateList() {
+      return ['48', '64', '96', '112', '128', '160', '192', '256', '320', '510'];
+    },
+
+    get opusDefaultBitrate() {
+      return '96';
     },
 
     get wmaBitrateList() {
@@ -78,6 +90,17 @@ const FmtcvtStore = t
           return self.wmaDefaultBitrate;
         case 'ogg(opus)':
           return self.oggopusDefaultBitrate;
+        case 'opus':
+          return self.opusDefaultBitrate;
+      }
+    },
+
+    get defaultSamplerate() {
+      if (self.fmt == 'ogg(opus)' ||
+          self.fmt == 'opus') {
+        return '48';
+      } else {
+        return '44.1';
       }
     },
 
@@ -90,10 +113,10 @@ const FmtcvtStore = t
     changeFmt(value) {
       self.fmt = value;
       self.bitrate = self.defaultBitrate;
+      self.samplerate = self.defaultSamplerate;
     },
 
     changeSamplerate(value) {
-      console.log('2222222222222222', value);
       self.samplerate = value;
     },
 
@@ -155,10 +178,10 @@ const toFFmpegArgs = (fmt, samplerate, channel, bitrate) => {
       //user aac_low
       return ["-c:a", "libfdk_aac", "-ar", samplerateString(samplerate), "-ac", channel, "-profile:a", "aac_low", "-b:a", bitrate+"k"]
     }
-  } else if (fmt == 'ogg(opus)') {
-      return ["-c:a", "libopus", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
+  } else if (fmt == 'ogg(opus)' || fmt == 'opus') {
+      return ["-c:a", "libopus", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k", "-vbr", "on", "-compression_level", "10"]
   } else if (fmt == 'wma') {
-      return ["-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
+      return ["-acodec", "wmav2", "-ar", samplerateString(samplerate), "-ac", channel, "-ab", bitrate+"k"]
   } else if (fmt == 'wav') {
       return ["-ar", samplerateString(samplerate), "-ac", channel]
   }
@@ -178,6 +201,8 @@ const toFFmpegFmtCvt = (fmt) => {
     return 'adts';
   } else if (fmt == 'ogg(opus)') {
     return 'ogg';
+  } else if (fmt == 'wma' || fmt == 'opus') {
+    return '';
   }
 }
 

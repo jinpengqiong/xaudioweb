@@ -54,12 +54,14 @@ const SamplerateOptions = ({...fmtcvtConfig}) => {
 
   if (fmtcvtConfig.fmt == 'ogg(opus)') {
     samplerateList = fmtcvtConfig.oggopusSamplerateList;
+  } else if (fmtcvtConfig.fmt == 'opus') {
+    samplerateList = fmtcvtConfig.opusSamplerateList;
   } else {
     samplerateList = fmtcvtConfig.samplerateList;
   }
 
-  for(let i = 0; i < fmtcvtConfig.samplerateList.length; i++) {
-    list.push(<Option key={'samplerate'+i.toString()} value={fmtcvtConfig.samplerateList[i]}>{fmtcvtConfig.samplerateList[i] + ' kHz'}</Option>)
+  for(let i = 0; i < samplerateList.length; i++) {
+    list.push(<Option key={'samplerate'+i.toString()} value={samplerateList[i]}>{samplerateList[i] + ' kHz'}</Option>)
   }
 
   return (<Select value={fmtcvtConfig.samplerate}  onChange={fmtcvtConfig.changeSamplerate}>
@@ -108,6 +110,10 @@ const BitrateOptions = ({...fmtcvtConfig}) => {
     case 'ogg(opus)':
       bitrateList = fmtcvtConfig.oggopusBitrateList;
       defaultBitrate = fmtcvtConfig.oggopusDefaultBitrate;
+      break;
+    case 'opus':
+      bitrateList = fmtcvtConfig.opusBitrateList;
+      defaultBitrate = fmtcvtConfig.opusDefaultBitrate;
       break;
     case 'wma':
       bitrateList = fmtcvtConfig.wmaBitrateList;
@@ -158,6 +164,7 @@ class FmtcvtPage extends React.Component {
 
       samplerateList: fmtcvt.samplerateList,
       oggopusSamplerateList: fmtcvt.oggopusSamplerateList,
+      opusSamplerateList: fmtcvt.opusSamplerateList,
 
       mp3BitrateList: fmtcvt.mp3BitrateList,
       mp3DefaultBitrate: fmtcvt.mp3DefaultBitrate,
@@ -165,6 +172,8 @@ class FmtcvtPage extends React.Component {
       aacDefaultBitrate: fmtcvt.aacDefaultBitrate,
       oggopusBitrateList: fmtcvt.oggopusBitrateList,
       oggopusDefaultBitrate: fmtcvt.oggopusDefaultBitrate,
+      opusBitrateList: fmtcvt.opusBitrateList,
+      opusDefaultBitrate: fmtcvt.opusDefaultBitrate,
       wmaBitrateList: fmtcvt.wmaBitrateList,
       wmaDefaultBitrate: fmtcvt.wmaDefaultBitrate,
 
