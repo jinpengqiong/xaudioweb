@@ -206,7 +206,7 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
 
         break;
       case "exit":
-        console.log(stdout);
+        //console.log(stdout);
         selfEnv.setProcessing(false);
         worker.terminate();
         break;
@@ -260,14 +260,15 @@ export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPr
     var msg = e.data;
     switch (msg.type) {
       case "ready":
-        console.log("=======================> is ready");
+        //console.log("=======================> is ready");
         selfEnv.setProgress(2);
         break;
       case "stdout":
         let p = parseProgress(fileSize, msg.data);
         if (p >= 0) {
           if (pp != p) {
-            console.log("===========> progress=", self.progress);
+            //console.log("===========> progress=", self.progress);
+            selfEnv.setLoading(false);
             selfEnv.setProgress(p);
             pp = p;
           }
@@ -277,10 +278,12 @@ export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPr
         break;
       case "exit":
         //console.log(stdout);
+        selfEnv.setProcessing(false);
         worker.terminate();
         break;
       case "done":
         selfEnv.setProgress(100);
+        selfEnv.setProcessing(false);
         //console.log("44444444444444: ", msg.data);
         downFile(msg.data, outputFileName);
 

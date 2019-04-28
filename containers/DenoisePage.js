@@ -6,7 +6,7 @@ import env from '../config/env';
 
 import {Layout, Row, Col, Radio, Input, Progress, 
         Button, Upload, Icon, Slider, Switch, Alert,
-        Form, Divider} from 'antd';
+        Form, Divider, Spin} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
 import {CommonHeader, CommonFooter, CommonNoteTip} from './CommonHeaderFooter';
 
@@ -15,6 +15,7 @@ import langmap from '../config/langmap';
 
 const {Header, Footer, Sider, Content} = Layout;
 const RadioGroup = Radio.Group;
+const antIcon = <Icon type="loading" style={{ fontSize: 18 }} spin />;
 
 const radioStyle = {
   display: 'block',
@@ -123,16 +124,19 @@ class DenoisePage extends React.Component {
                        beforeUpload={denoise.openFile}
                        showUploadList={false}
                        >
-                        <Button>
-                          <Icon type="upload"/> {langmap.UploadProcess[lang]} 
-                        </Button>
+                        <Col span={4}>
+                          <Button disabled={denoise.isProcessing}>
+                            <Icon type="upload"/> {langmap.UploadProcess[lang]} 
+                          </Button>
+                        </Col>
+                        <Col span={2} offset={18}>
+                          <Spin spinning={denoise.isLoading} indicator={antIcon} />
+                        </Col>
                       </Upload>
                       <div>{denoise.fileName} </div>
                     </Col>
                   </Col>
                 </Row>
-
-
 
               </WrapperRelative>
             </Content>

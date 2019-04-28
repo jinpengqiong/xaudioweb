@@ -7,6 +7,9 @@ const BgmStore = t
     gain: t.optional(t.string, "1.0"),
     fileName: t.optional(t.string, ''),
     progress: t.optional(t.number, 0),
+
+    isLoading: t.optional(t.boolean, false),
+    isProcessing: t.optional(t.boolean, false),
   })
   .views(self => ({
     get root() {
@@ -19,11 +22,22 @@ const BgmStore = t
       self[e.target.name] = e.target.value; 
     },
 
+    setLoading(value) {
+      self.isLoading = value;
+    },
+
+    setProcessing(value) {
+      self.isProcessing = value;
+    },
+
     setProgress(progress) {
       self.progress = progress;
     },
 
     openFile(file) {
+      self.isLoading = true;
+      self.isProcessing = true;
+
       const isWav = (file.type === 'audio/wav');
       if (!isWav) {
         message.error("Not wav file!");

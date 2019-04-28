@@ -9,6 +9,10 @@ const DenoiseStore = t
     lpfFc: t.optional(t.string, "0.6"),
     fileName: t.optional(t.string, ''),
     progress: t.optional(t.number, 0),
+
+
+    isLoading: t.optional(t.boolean, false),
+    isProcessing: t.optional(t.boolean, false),
   })
   .views(self => ({
     get root() {
@@ -25,11 +29,22 @@ const DenoiseStore = t
       self.mode = e.target.value;
     },
 
+    setLoading(value) {
+      self.isLoading = value;
+    },
+
+    setProcessing(value) {
+      self.isProcessing = value;
+    },
+
     setProgress(progress) {
       self.progress = progress;
     },
 
     openFile(file) {
+      self.isLoading = true;
+      self.isProcessing = true;
+
       //console.log("1111111111111111111", file.type);
       const isWav = (file.type === 'audio/wav');
       if (!isWav) {
