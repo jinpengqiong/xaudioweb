@@ -215,6 +215,8 @@ const toFFmpegFmtName = (fmt) => {
 const toFFmpegFmtCvt = (fmt) => {
   if (fmt == 'aac') {
     return 'adts';
+  } else if (fmt == 'm4a') {
+    return 'mp4';
   } else if (fmt == 'ogg(opus)') {
     return 'ogg';
   } else if (fmt == 'wma' || fmt == 'opus') {
