@@ -197,16 +197,22 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
           gFFmpegDuration = tmpProgress.duration;
           gFFmpegProgress = tmpProgress.progress;
 
+          if (gFFmpegProgress > 0) {
+            //console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+            selfEnv.setLoading(false);
+          }
           selfEnv.setProgress(gFFmpegProgress);
         }
 
         break;
       case "exit":
         console.log(stdout);
+        selfEnv.setProcessing(false);
         worker.terminate();
         break;
       case "done":
         selfEnv.setProgress(100);
+        selfEnv.setProcessing(false);
         //console.log("44444444444444: ", msg.data);
         if (!gError)
           downFile(msg.data, outputFileName);

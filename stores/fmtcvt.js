@@ -2,47 +2,6 @@ import {types as t, flow, getParent} from 'mobx-state-tree';
 import { processFFmpegFile } from '../utils/common';
 import {message} from 'antd';
 
-const checkValidAudioFile = (file) => {
-
-  let isValidType = (file.type === 'audio/wav') ||
-                    (file.type === 'audio/x-wav') ||
-                    (file.type === 'audio/mp3') ||
-                    (file.type === 'audio/mp4') ||
-                    (file.type === 'audio/mpeg') ||
-                    (file.type === 'audio/aac') ||
-                    (file.type === 'audio/aac-adts') ||
-                    (file.type === 'audio/x-matroska') ||
-                    (file.type === 'application/ogg') ||
-                    (file.type === 'audio/ogg') ||
-                    (file.type === 'audio/x-m4a') ||
-                    (file.type === 'audio/ac3') ||
-                    (file.type === 'audio/x-ms-wma') ||
-                    (file.type === 'video/x-ms-wma') ||
-                    (file.type === 'audio/flac');
-
-  let fileName = file.name;
-
-  let inputFileName = file.name;
-  let tmpName = inputFileName.split(".");
-  let suffix = tmpName[tmpName.length-1];
-
-  //console.log("rrrrrrrrrrrr: ", suffix);
-
-  let isValidSuffix = (suffix == "wav") ||
-                      (suffix == "ape") ||
-                      (suffix == "mp3") ||
-                      (suffix == "aac") ||
-                      (suffix == "m4a") ||
-                      (suffix == "ac3") ||
-                      (suffix == "ogg") ||
-                      (suffix == "opus") ||
-                      (suffix == "wma") ||
-                      (suffix == "flac");
-
-  return isValidType || isValidSuffix;
-
-}
-
 const FmtcvtStore = t
   .model({
     fileName: t.optional(t.string, ''),
@@ -54,6 +13,8 @@ const FmtcvtStore = t
 
     errCvt: t.optional(t.boolean, false),
     errInfo: t.optional(t.string, ''),
+    isLoading: t.optional(t.boolean, false),
+    isProcessing: t.optional(t.boolean, false),
   })
   .views(self => ({
     get root() {
@@ -184,6 +145,14 @@ const FmtcvtStore = t
       self.bitrate = value;
     },
 
+    setLoading(value) {
+      self.isLoading = value;
+    },
+
+    setProcessing(value) {
+      self.isProcessing = value;
+    },
+
     setProgress(progress) {
       self.progress = progress;
     },
@@ -200,6 +169,8 @@ const FmtcvtStore = t
 
     openFile(file) {
       self.resetErr();
+      self.isLoading = true;
+      self.isProcessing = true;
 
       if (!checkValidAudioFile(file)) {
         message.error("Not wav|flac|ape|mp4|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma file!");
@@ -273,6 +244,48 @@ const toFFmpegFmtCvt = (fmt) => {
     return fmt;
   }
 }
+
+const checkValidAudioFile = (file) => {
+
+  let isValidType = (file.type === 'audio/wav') ||
+                    (file.type === 'audio/x-wav') ||
+                    (file.type === 'audio/mp3') ||
+                    (file.type === 'audio/mp4') ||
+                    (file.type === 'audio/mpeg') ||
+                    (file.type === 'audio/aac') ||
+                    (file.type === 'audio/aac-adts') ||
+                    (file.type === 'audio/x-matroska') ||
+                    (file.type === 'application/ogg') ||
+                    (file.type === 'audio/ogg') ||
+                    (file.type === 'audio/x-m4a') ||
+                    (file.type === 'audio/ac3') ||
+                    (file.type === 'audio/x-ms-wma') ||
+                    (file.type === 'video/x-ms-wma') ||
+                    (file.type === 'audio/flac');
+
+  let fileName = file.name;
+
+  let inputFileName = file.name;
+  let tmpName = inputFileName.split(".");
+  let suffix = tmpName[tmpName.length-1];
+
+  //console.log("rrrrrrrrrrrr: ", suffix);
+
+  let isValidSuffix = (suffix == "wav") ||
+                      (suffix == "ape") ||
+                      (suffix == "mp3") ||
+                      (suffix == "aac") ||
+                      (suffix == "m4a") ||
+                      (suffix == "ac3") ||
+                      (suffix == "ogg") ||
+                      (suffix == "opus") ||
+                      (suffix == "wma") ||
+                      (suffix == "flac");
+
+  return isValidType || isValidSuffix;
+
+}
+
 
 
 export default FmtcvtStore;
