@@ -43,10 +43,7 @@ export const HeaderLogo = styled.div`
 export const HeaderLogo2 = styled.div`
   height: 62px;
   background: ${props => (props.background ? props.background : '#333')};
-  background-image: url(${props => props.backgroundImage+".jpg"}),
-                    url(${props => props.backgroundImage+".png"}),
-                    url(${props => props.backgroundImage+".gif"}),
-                    url(${props => props.backgroundImage+".jpeg"});
+  background-image: url(${props => props.backgroundImage+".png"});
   background-repeat:no-repeat;
   background-position:center;
   background-size:cover;

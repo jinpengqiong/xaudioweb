@@ -38,7 +38,7 @@ const BgmStore = t
       self.isLoading = true;
       self.isProcessing = true;
 
-      const isWav = (file.type === 'audio/wav');
+      const isWav = (file.type === 'audio/wav') || (file.type === 'audio/x-wav');
       if (!isWav) {
         message.error("Not wav file!");
         return false;

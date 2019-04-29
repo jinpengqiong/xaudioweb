@@ -13,7 +13,8 @@ export default class MyDocument extends Document {
       <html>
         <Head>
           <title>剪音网</title>
-          <script src="/static/download.js"> </script>
+          <link rel="shortcut icon" href="/static/favicon.ico" />
+          <link rel="bookmark" href="/static/favicon.ico" type="image/x-icon"　/> 
           <script src="/static/baidu.js"> </script>
 
           {styleTags}
@@ -27,3 +28,4 @@ export default class MyDocument extends Document {
   }
 }
 
+          //<script src="/static/download.js"> </script>

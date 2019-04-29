@@ -3,7 +3,7 @@ import Router from 'next/router'
 import {validToken} from './net';
 import {message} from 'antd';
 import langmap from '../config/langmap';
-
+import { saveAs } from 'file-saver';
 
 //export const DEFAULT_LIMIT = 20;
 export const DEFAULT_LIMIT = 2;
@@ -130,7 +130,10 @@ export function downFile(data, fileName) {
   }
 */
 
-  download( new Blob([data]), fileName, "application/octet-stream" );
+  //download( new Blob([data]), fileName, "application/octet-stream" );
+
+  var blob = new Blob([data], {type: "application/octet-stream"});
+  saveAs(blob, fileName);
 
 }
 

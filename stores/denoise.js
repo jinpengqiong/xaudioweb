@@ -45,8 +45,7 @@ const DenoiseStore = t
       self.isLoading = true;
       self.isProcessing = true;
 
-      //console.log("1111111111111111111", file.type);
-      const isWav = (file.type === 'audio/wav');
+      const isWav = (file.type === 'audio/wav') || (file.type === 'audio/x-wav');
       if (!isWav) {
         message.error("Not wav file!");
         return false;
