@@ -149,7 +149,14 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
   let inputFileName = file.name;
   //let outputFileName = outputPrefix + inputFileName;
   let tmpName = inputFileName.split(".");
-  let outputFileName = tmpName[tmpName.length-2] + "." + outputFmtName;
+  let surffix = tmpName[tmpName.length-1];
+  let outputFileName;
+  
+  if (surffix == outputFmtName) {
+    outputFileName = tmpName[tmpName.length-2] + "(1)." + outputFmtName;
+  } else {
+    outputFileName = tmpName[tmpName.length-2] + "." + outputFmtName;
+  }
 
   let reader = new FileReader();
   let fileSize = file.size;
@@ -196,7 +203,7 @@ export function processFFmpegFile(selfEnv, file, workerPath, workerArgs, outputP
           gError = 1;
           selfEnv.setError(msg.data);
         } else {
-          let tmpProgress = parseFFmpegProgress(gFFmpegDuration, gFFmpegProgress, msg.data);
+          let tmpProgress = parseFFmpegProgress(fileSize, gFFmpegDuration, gFFmpegProgress, msg.data);
           gFFmpegDuration = tmpProgress.duration;
           gFFmpegProgress = tmpProgress.progress;
 
@@ -302,18 +309,30 @@ export function processAudioFile(selfEnv, file, workerPath, workerArgs, outputPr
 
 }
 
-const parseFFmpegProgress = (duration, progress, info) => {
+const estimateDuration = (fileSize) => {
+  return parseInt(fileSize/2644);
+}
+
+const parseFFmpegProgress = (fileSize, duration, progress, info) => {
   if (duration == 0) {
     if (info.indexOf("Duration") >= 0) {
       let timeArray = info.replace(/\s*/g,"").split(",")[0].split(":");
-      let hour = parseInt(timeArray[1]);
-      let min = parseInt(timeArray[2]);
-      let sec = parseInt(timeArray[3].split(".")[0]);
 
-      return {
-        duration: hour*3600 + min*60 + sec,
-        progress: 0 
-      };
+      if (timeArray.length == 2 && timeArray[1] == "N/A") {
+        return {
+          duration: estimateDuration(fileSize),
+          progress: 0
+        }
+      } else {
+        let hour = parseInt(timeArray[1]);
+        let min = parseInt(timeArray[2]);
+        let sec = parseInt(timeArray[3].split(".")[0]);
+
+        return {
+          duration: hour*3600 + min*60 + sec,
+          progress: 0 
+        };
+      }
     } else {
       return {duration: 0, progress: 0};
     }
