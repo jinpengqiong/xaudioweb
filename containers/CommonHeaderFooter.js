@@ -28,9 +28,13 @@ function CommonNoteTip({lang}) {
 
 function CommonFooter() {
   return (
-    <Footer style={{ textAlign: 'center' }}>
-      XAudioPro ©2019 Created by luolongzhi 
-    </Footer>
+    <div>
+      <Footer style={{ textAlign: 'center' }}>
+        <font color="#9e9e9e" size="2" >
+          剪音网 www.xudiopro.com ©2019 Created by luolongzhi  (网站备案号: 蜀ICP备17042496号-2)  --- QQ技术支持群: 568123255
+        </font>
+      </Footer>
+    </div>
   );
 }
 

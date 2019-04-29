@@ -1,7 +1,7 @@
 const langmap = {
   CommonTip: {
     'default': '',
-    'zh': '请使用高版本的 Chrome/FireFox/Safari 现代浏览器, 本站采用H5/WebAssembly技术, 在浏览器中高效直接运行处理, 拥有与本地软件一致的体验!',
+    'zh': '请使用最新高版本的 Chrome(谷歌, 推荐) | FireFox(火狐) | Safari(>=12.1) 浏览器, 本站采用H5/WebAssembly技术, 在浏览器中高效直接运行处理, 拥有与本地软件一致的体验!',
     'en': 'Audio Process',
   },
 
@@ -115,7 +115,7 @@ const langmap = {
 
   AudioCovertInputSupport: {
     'default': '',
-    'zh': '自动识别输入格式, 支持的输入格式(wav|flac|ape|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma)',
+    'zh': '自动识别输入格式, 支持格式为 wav|flac|ape|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma',
     'en': 'Support input format (wav|flac|ape|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma)',
   },
 
