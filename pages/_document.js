@@ -1,6 +1,14 @@
 import Document, { Head, Main, NextScript } from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
 
+import env from '../config/env';
+
+const baidujs = () => {
+  if (env.BAIDU) {
+    return (<script src="/static/baidu.js"> </script>)
+  }
+}
+
 /* eslint-disable */
 export default class MyDocument extends Document {
   render() {
@@ -15,7 +23,8 @@ export default class MyDocument extends Document {
           <title>剪音网</title>
           <link rel="shortcut icon" href="/static/favicon.ico" />
           <link rel="bookmark" href="/static/favicon.ico" type="image/x-icon"　/> 
-          <script src="/static/baidu.js"> </script>
+
+          {baidujs()}
 
           {styleTags}
         </Head>

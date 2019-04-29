@@ -4,6 +4,9 @@ const config = {
   API_PREFIX: ':8089',
   FOOTER_TEXT: '',
 
+  BAIDU: 0,
+  
+
 }
 
 
