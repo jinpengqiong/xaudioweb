@@ -3,7 +3,7 @@ const config = {
   API_PREFIX: '/api',
   FOOTER_TEXT: '',
 
-  BAIDU: 0,
+  BAIDU: 1,
 }
 
 
