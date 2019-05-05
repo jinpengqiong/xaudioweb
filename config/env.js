@@ -1,7 +1,7 @@
-//import config from './env/dev'
+import config from './env/dev'
 //import config from './env/test'
 
-import config from './env/prod'
+//import config from './env/prod'
 
 const normal = {
   PAGE_SIZE: 50,
