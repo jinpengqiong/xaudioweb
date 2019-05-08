@@ -23,6 +23,7 @@ export default class MyDocument extends Document {
           <title>剪音网</title>
           <link rel="shortcut icon" href="/static/favicon.ico" />
           <link rel="bookmark" href="/static/favicon.ico" type="image/x-icon"　/> 
+          <script src="https://unpkg.com/wavesurfer.js"></script>
 
           {baidujs()}
 

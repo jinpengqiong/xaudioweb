@@ -11,6 +11,12 @@ const langmap = {
     'en': 'Audio Process',
   },
 
+  AudioEdit: {
+    'default': '',
+    'zh': '音频编辑',
+    'en': 'Audio Edit',
+  },
+
   AudioProcessDenoise: {
     'default': '',
     'zh': '音频去噪',

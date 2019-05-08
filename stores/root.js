@@ -5,6 +5,7 @@ import NavigationStore from './navigation';
 import DenoiseStore from './denoise';
 import BgmStore from './bgm';
 import FmtcvtStore from './fmtcvt';
+import EditStore from './edit';
 
 const RootStore = t
   .model({
@@ -14,6 +15,7 @@ const RootStore = t
     denoise: t.optional(DenoiseStore, {}),
     bgm: t.optional(BgmStore, {}),
     fmtcvt: t.optional(FmtcvtStore, {}),
+    edit: t.optional(EditStore, {}),
   })
   .views(self => ({
   }))

@@ -67,7 +67,13 @@ class Navigation extends React.Component {
             </Link>
           </Menu.Item>
 
-
+          <Menu.Item key="audio_edit">
+            <Icon type="scissor" />
+            <span>{langmap.AudioEdit[lang]}</span>
+            <Link href="/edit">
+            <a>{langmap.AudioEdit[lang]}</a>
+            </Link>
+          </Menu.Item>
 
 
         </Menu>
