@@ -1,4 +1,5 @@
 import * as util from 'util';
+import WebAudio from '../utils/webaudio';
 import { EventEmitter } from  'events';
 import * as _ from 'lodash';
 
@@ -43,6 +44,8 @@ class CanvasWave extends EventEmitter {
     this.setProgressColor(this.params.progressColor);
     this.setCursorColor(this.params.cursorColor);
 
+    //set audio context
+    this.backend = new WebAudio()
 
     console.log("current params: ", this.params);
   }
@@ -77,6 +80,22 @@ class CanvasWave extends EventEmitter {
     this.canvasContext.lineTo(20,100);
     this.canvasContext.lineTo(70,100);
     this.canvasContext.stroke();
+  }
+
+  drawFrequency(freqArray) {
+    this.canvasContext.fillStyle = 'rgb(0, 0, 0)';
+    this.canvasContext.fillRect(0, 0, 500, 500);
+
+    var barWidth = (500 / bufferLength) * 2.5;
+    var barHeight;
+    var x = 0;
+
+    for(var i = 0; i < bufferLength; i++) {
+      barHeight = freqArray[i];
+      this.canvasContext.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+      this.canvasContext.fillRect(x,500-barHeight/2,barWidth,barHeight/2);
+      x += barWidth + 1;
+    }
   }
 
   setBackgroundColor(color) {

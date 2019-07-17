@@ -17,6 +17,24 @@ const EditStore = t
       self[e.target.name] = e.target.value; 
     },
 
+
+    openFile(file) {
+      //self.resetErr();
+      self.isLoading = true;
+      self.isProcessing = true;
+
+      //if (!checkValidAudioFile(file)) {
+        //message.error("Not wav|flac|ape|mp4|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma file!");
+        //return false;
+      //}
+
+      //return processFFmpegFile();
+      return;
+    },
+
+
+
+
   }));
 
 

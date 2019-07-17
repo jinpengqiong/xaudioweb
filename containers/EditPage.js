@@ -55,7 +55,7 @@ class EditPage extends React.Component {
     navigation.setNav('audio_edit');
 
 
-    TT4();
+    //TT4();
   }
 
   componentWillUnmount() {}
@@ -81,6 +81,23 @@ class EditPage extends React.Component {
                   <Col span={20} offset={0}>
                   <CanvasBg/>
                   </Col>
+                </Row>
+                <Row>
+                  <Upload 
+                    action=""
+                    beforeUpload={edit.openFile}
+                    showUploadList={false}
+                  >
+                    <Col span={4}>
+                      <Button disabled={edit.isProcessing}>
+                      <Icon type="upload"/> {langmap.UploadProcess[lang]} 
+                      </Button>
+                    </Col>
+                    <Col span={2} offset={18}>
+                      <Spin spinning={edit.isLoading} indicator={antIcon} />
+                    </Col>
+                  </Upload>
+
                 </Row>
               </WrapperRelative>
               <div id="waveform"></div>
