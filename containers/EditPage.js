@@ -42,7 +42,8 @@ const CanvasBg = () => {
 const TT4 = () => {
   const canvasWave = CanvasWave.create({container: BG_ID, hRatio: 0.2});
 
-  canvasWave.load();
+  //canvasWave.load();
+  canvasWave.startDecodeAudioData();
 }
 
 class EditPage extends React.Component {
@@ -62,6 +63,7 @@ class EditPage extends React.Component {
 
   render() {
     const {lang, edit} = this.props.store;
+    console.log("1111111111111111111", edit.isLoading);
 
 
     return (

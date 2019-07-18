@@ -5,6 +5,9 @@ import {message} from 'antd';
 import langmap from '../config/langmap';
 import { saveAs } from 'file-saver';
 
+
+import CanvasWave from '../components/CanvasWave';
+
 //export const DEFAULT_LIMIT = 20;
 export const DEFAULT_LIMIT = 2;
 
@@ -387,6 +390,26 @@ const checkError = (info) => {
 }
 
 
+export function processEditFile(selfEnv, file) {
+  let reader = new FileReader();
+  let fileSize = file.size;
+
+  //selfEnv.fileName = inputFileName;
+
+  console.log("11111111111111111000000000000000000");
+  let canvasWave = CanvasWave.create({container: "canvas__edit_bg", hRatio: 0.2});
+
+  reader.onload = () => {
+    let arrayBuffer = reader.result;
+
+    console.log("111111111111", arrayBuffer.length)
+    canvasWave.startDecodeAudioData(arrayBuffer);
+  };
+
+
+  reader.readAsArrayBuffer(file);
+
+}
 
 
 

@@ -1,10 +1,12 @@
 import {types as t, flow, getParent} from 'mobx-state-tree';
 import {message} from 'antd';
+import { processEditFile } from '../utils/common';
 
 const EditStore = t
   .model({
     fileName: t.optional(t.string, ''),
-
+    isLoading: t.optional(t.boolean, false),
+    isProcessing: t.optional(t.boolean, false),
   })
   .views(self => ({
     get root() {
@@ -29,7 +31,8 @@ const EditStore = t
       //}
 
       //return processFFmpegFile();
-      return;
+
+      return processEditFile(self, file)
     },
 
 

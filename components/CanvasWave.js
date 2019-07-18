@@ -82,7 +82,12 @@ class CanvasWave extends EventEmitter {
     this.canvasContext.stroke();
   }
 
-  drawFrequency(freqArray) {
+  drawFrequency(freqArray, bufferLength) {
+    //drawVisual = requestAnimationFrame(this.drawFrequency);
+
+    window.requestAnimationFrame(this.drawFrequency);
+
+    console.log("333333333333333333-------");
     this.canvasContext.fillStyle = 'rgb(0, 0, 0)';
     this.canvasContext.fillRect(0, 0, 500, 500);
 
@@ -96,6 +101,64 @@ class CanvasWave extends EventEmitter {
       this.canvasContext.fillRect(x,500-barHeight/2,barWidth,barHeight/2);
       x += barWidth + 1;
     }
+  }
+
+  startDecodeAudioData(rawData) {
+    let ac = this.backend.ac;
+
+    ac.decodeAudioData(rawData, (buffer) => {
+      //create buffer source node and frequency analyser
+      let audioBufferSourceNode = ac.createBufferSource();
+
+      let analyser = ac.createAnalyser();
+      analyser.fftSize = 256;
+
+      //destination is the play sound card
+      audioBufferSourceNode.connect(analyser);
+      analyser.connect(ac.destination);
+      console.log(ac.destination)
+
+      //play audio
+      audioBufferSourceNode.buffer = buffer;
+      audioBufferSourceNode.start();
+            
+      //draw bin freq
+      let bufferLength = analyser.frequencyBinCount;
+      console.log(bufferLength);
+      var dataArray = new Uint8Array(bufferLength);
+      console.log(dataArray)
+
+      analyser.getByteFrequencyData(dataArray, analyser.frequencyBinCount);
+      //this.drawFrequency(dataArray)
+
+      let canvasContext = this.canvasContext;
+      canvasContext.clearRect(0, 0, 500, 500);
+
+      function drawFrequency() {
+        //drawVisual = requestAnimationFrame(this.drawFrequency);
+
+        window.requestAnimationFrame(drawFrequency);
+
+        console.log("333333333333333333-------");
+        canvasContext.fillStyle = 'rgb(0, 0, 0)';
+        canvasContext.fillRect(0, 0, 500, 500);
+
+        var barWidth = (500 / bufferLength) * 2.5;
+        var barHeight;
+        var x = 0;
+
+        for(var i = 0; i < bufferLength; i++) {
+          barHeight = dataArray[i];
+          canvasContext.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+          canvasContext.fillRect(x,500-barHeight/2,barWidth,barHeight/2);
+          x += barWidth + 1;
+        }
+      }
+
+      drawFrequency();
+
+
+    })
   }
 
   setBackgroundColor(color) {
