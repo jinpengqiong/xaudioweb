@@ -397,7 +397,7 @@ export function processEditFile(selfEnv, file) {
   //selfEnv.fileName = inputFileName;
 
   console.log("11111111111111111000000000000000000");
-  let canvasWave = CanvasWave.create({container: "canvas__edit_bg", hRatio: 0.2});
+  let canvasWave = CanvasWave.create({container: "canvas__edit_bg", hRatio: 0.9});
 
   reader.onload = () => {
     let arrayBuffer = reader.result;

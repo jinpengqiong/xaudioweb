@@ -7,6 +7,8 @@ import BgmStore from './bgm';
 import FmtcvtStore from './fmtcvt';
 import EditStore from './edit';
 
+import fetch from 'isomorphic-fetch';
+
 const RootStore = t
   .model({
     logo: t.optional(t.string, '/static/play_logo'),

@@ -153,6 +153,7 @@ class FmtcvtPage extends React.Component {
   componentDidMount() {
     const {navigation} = this.props.store;
     navigation.setNav('audio_covert_format');
+    navigation.root.load();
   }
 
   componentWillUnmount() {}
