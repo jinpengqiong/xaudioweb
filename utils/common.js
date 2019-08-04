@@ -32,6 +32,26 @@ function randomKey (len, chars) {
 	return str;
 }
 
+export const max = (values) => {
+  let largest = -Infinity;
+  Object.keys(values).forEach(i => {
+    if (values[i] > largest) {
+      largest = values[i];
+    }
+  });
+  return largest;
+}
+
+export const min = (values) => {
+  let smallest = Number(Infinity);
+  Object.keys(values).forEach(i => {
+    if (values[i] < smallest) {
+      smallest = values[i];
+    }
+  });
+  return smallest;
+}
+
 export const randomString = (len, chars) => {
   return randomKey(len, chars);
 };

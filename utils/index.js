@@ -7,3 +7,4 @@ export { default as style } from './style';
 export { default as getId } from './getid';
 export { default as preventClick } from './prevent-click';
 export { default as debounce } from 'debounce';
+export { default as fetchFile } from './fetch';
