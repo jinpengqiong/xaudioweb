@@ -1,5 +1,5 @@
 import * as util from 'util';
-import WebAudio from '../audio/webaudio';
+import WebAudio from '../audio/WebAudio';
 import { EventEmitter } from  'events';
 import * as _ from 'lodash';
 

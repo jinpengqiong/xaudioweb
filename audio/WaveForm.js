@@ -469,14 +469,10 @@ export default class WaveForm extends utils.Observer {
     // Create file reader
     const reader = new FileReader();
     reader.addEventListener('progress', e => this.onProgress(e));
-    reader.addEventListener('load', e =>
-                            this.loadArrayBuffer(e.target.result)
-                           );
-                           reader.addEventListener('error', () =>
-                                                   this.fireEvent('error', 'Error reading file')
-                                                  );
-                                                  reader.readAsArrayBuffer(blob);
-                                                  this.empty();
+    reader.addEventListener('load', e => this.loadArrayBuffer(e.target.result));
+    reader.addEventListener('error', () => this.fireEvent('error', 'Error reading file'));
+    reader.readAsArrayBuffer(blob);
+    this.empty();
   }
 
   load(url, peaks, duration) {
@@ -518,29 +514,19 @@ export default class WaveForm extends utils.Observer {
   }
 
   getArrayBuffer(url, callback) {
-    let options = utils.extend(
-      {
+    let options = utils.extend({
       url: url,
       responseType: 'arraybuffer'
-    },
-    this.params.xhr
-    );
+    }, this.params.xhr);
+
     const request = utils.fetchFile(options);
 
     this.currentRequest = request;
 
     this.tmpEvents.push(
-      request.on('progress', e => {
-      this.onProgress(e);
-    }),
-    request.on('success', data => {
-      callback(data);
-      this.currentRequest = null;
-    }),
-    request.on('error', e => {
-      this.fireEvent('error', 'fetch error: ' + e.message);
-      this.currentRequest = null;
-    })
+      request.on('progress', e => { this.onProgress(e); }),
+      request.on('success', data => { callback(data); this.currentRequest = null; }),
+      request.on('error', e => { this.fireEvent('error', 'fetch error: ' + e.message); this.currentRequest = null; })
     );
 
     return request;
@@ -617,7 +603,6 @@ export default class WaveForm extends utils.Observer {
   }
 
   destroy() {
-    this.destroyAllPlugins();
     this.fireEvent('destroy');
     this.cancelAjax();
     this.clearTmpEvents();
