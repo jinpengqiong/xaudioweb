@@ -1,6 +1,6 @@
 import RectWrapper from './RectWrapper';
 import WaveCanvas from './WaveCanvas';
-import * as utils from './utils';
+import * as utils from '../utils';
 
 export default class WaveCanvasGroup extends RectWrapper {
   constructor(container, params) {

@@ -14,6 +14,7 @@ import Navigation from './Navigation';
 import langmap from '../config/langmap';
 
 import CanvasWave from '../components/CanvasWave';
+import WaveForm from '../audio/WaveForm';
 
 import { fabric } from 'fabric';
 
@@ -46,6 +47,20 @@ const TT4 = () => {
   canvasWave.startDecodeAudioData();
 }
 
+const tt5 = () => {
+  var wavesurfer = WaveForm.create({
+    container: '#waveform',
+    waveColor: 'violet',
+    progressColor: 'purple'
+  });
+
+  wavesurfer.on('ready', function () {
+    wavesurfer.play();
+  });
+
+  wavesurfer.load('static/cc.mp3');
+}
+
 class EditPage extends React.Component {
 
   componentWillMount() {
@@ -57,6 +72,8 @@ class EditPage extends React.Component {
 
 
     //TT4();
+
+    tt5();
   }
 
   componentWillUnmount() {}
@@ -79,6 +96,7 @@ class EditPage extends React.Component {
                 <CommonNoteTip lang={lang}/>
               </Row>
               <WrapperRelative top={"0px"} left={"1px"}>
+                <div id="waveform"></div>
                 <Row>
                   <Col span={20} offset={0}>
                   <CanvasBg/>

@@ -9,7 +9,7 @@ export default class WebAudio extends utils.Observer {
   audioContext = null;
   offlineAudioContext = null;
   stateBehaviors = {
-    PLAYING: {
+    [PLAYING]: {
       init() {
         this.addOnAudioProcess();
       },
@@ -21,7 +21,7 @@ export default class WebAudio extends utils.Observer {
         return this.startPosition + this.getPlayedTime();
       }
     },
-    PAUSED: {
+    [PAUSED]: {
       init() {
         this.removeOnAudioProcess();
       },
@@ -33,7 +33,7 @@ export default class WebAudio extends utils.Observer {
         return this.startPosition;
       }
     },
-    FINISHED: {
+    [FINISHED]: {
       init() {
         this.removeOnAudioProcess();
         this.fireEvent('finish');
@@ -77,9 +77,9 @@ export default class WebAudio extends utils.Observer {
     this.startPosition = 0;
     this.scheduledPause = null;
     this.states = {
-      PLAYING: Object.create(this.stateBehaviors[PLAYING]),
-      PAUSED: Object.create(this.stateBehaviors[PAUSED]),
-      FINISHED: Object.create(this.stateBehaviors[FINISHED])
+      [PLAYING]: Object.create(this.stateBehaviors[PLAYING]),
+      [PAUSED]: Object.create(this.stateBehaviors[PAUSED]),
+      [FINISHED]: Object.create(this.stateBehaviors[FINISHED])
     };
     this.analyser = null;
     this.buffer = null;
