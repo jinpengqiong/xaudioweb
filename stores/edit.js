@@ -25,6 +25,10 @@ const EditStore = t
       self.isLoading = true;
       self.isProcessing = true;
 
+
+      console.log("11111111111", file);
+
+
       //if (!checkValidAudioFile(file)) {
         //message.error("Not wav|flac|ape|mp4|mp3|aac|m4a|ac3|ogg|opus|vorbis|wma file!");
         //return false;

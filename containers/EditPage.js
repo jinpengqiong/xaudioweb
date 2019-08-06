@@ -47,11 +47,15 @@ const TT4 = () => {
   canvasWave.startDecodeAudioData();
 }
 
+var wavesurfer = null
+
 const tt5 = () => {
-  var wavesurfer = WaveForm.create({
+  wavesurfer = WaveForm.create({
     container: '#waveform',
-    waveColor: 'violet',
-    progressColor: 'purple'
+    waveColor: 'green',
+    progressColor: 'white',
+    backgroundColor: 'black'
+
   });
 
   wavesurfer.on('ready', function () {
@@ -60,6 +64,8 @@ const tt5 = () => {
 
   wavesurfer.load('static/cc.mp3');
 }
+
+
 
 class EditPage extends React.Component {
 
@@ -81,6 +87,12 @@ class EditPage extends React.Component {
   render() {
     const {lang, edit} = this.props.store;
     console.log("1111111111111111111", edit.isLoading);
+
+
+    const loadAudio = (file) => {
+      wavesurfer.loadBlob(file)
+      //edit.openFile(file)
+    }
 
 
     return (
@@ -105,7 +117,7 @@ class EditPage extends React.Component {
                 <Row>
                   <Upload 
                     action=""
-                    beforeUpload={edit.openFile}
+                    beforeUpload={loadAudio}
                     showUploadList={false}
                   >
                     <Col span={4}>
