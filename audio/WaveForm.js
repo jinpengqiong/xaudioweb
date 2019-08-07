@@ -466,6 +466,7 @@ export default class WaveForm extends utils.Observer {
   }
 
   loadBlob(blob) {
+    console.log("9999999999999999", blob);
     // Create file reader
     const reader = new FileReader();
     reader.addEventListener('progress', e => this.onProgress(e));

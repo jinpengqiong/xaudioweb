@@ -15,6 +15,7 @@ import langmap from '../config/langmap';
 
 import CanvasWave from '../components/CanvasWave';
 import WaveForm from '../audio/WaveForm';
+import CommonWrapper from '../components/CommonWrapper';
 
 import { fabric } from 'fabric';
 
@@ -50,11 +51,20 @@ const TT4 = () => {
 var wavesurfer = null
 
 const tt5 = () => {
+  const aa = new CommonWrapper({
+    id: '#hhh',
+    wRatio: 1.0,
+    hRatio: 0.5,
+  });
+
+
   wavesurfer = WaveForm.create({
     container: '#waveform',
     waveColor: 'green',
     progressColor: 'white',
-    backgroundColor: 'black'
+    backgroundColor: 'black',
+    splitChannels: true,
+    height: 256
 
   });
 
@@ -62,7 +72,7 @@ const tt5 = () => {
     wavesurfer.play();
   });
 
-  wavesurfer.load('static/cc.mp3');
+  //wavesurfer.load('static/cc.mp3');
 }
 
 
@@ -108,7 +118,9 @@ class EditPage extends React.Component {
                 <CommonNoteTip lang={lang}/>
               </Row>
               <WrapperRelative top={"0px"} left={"1px"}>
-                <div id="waveform"></div>
+                <div id="hhh">
+                  <div id="waveform"/>
+                </div>
                 <Row>
                   <Col span={20} offset={0}>
                   <CanvasBg/>
@@ -132,7 +144,6 @@ class EditPage extends React.Component {
 
                 </Row>
               </WrapperRelative>
-              <div id="waveform"></div>
             </Content>
             <CommonFooter/>
           </Layout>
