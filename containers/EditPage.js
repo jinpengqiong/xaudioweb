@@ -21,6 +21,7 @@ import { fabric } from 'fabric';
 
 const {Header, Footer, Sider, Content} = Layout;
 const antIcon = <Icon type="loading" style={{ fontSize: 18 }} spin />;
+const ButtonGroup = Button.Group;
 
 
 const BG_ID = "canvas__edit_bg";
@@ -58,6 +59,19 @@ const tt5 = () => {
   });
 
 
+  wavesurfer = WaveForm.create({
+    container: '#waveform',
+    waveColor: 'green',
+    progressColor: 'white',
+    backgroundColor: 'black',
+    splitChannels: true,
+    height: 128
+
+  });
+
+
+
+
   //wavesurfer.load('static/cc.mp3');
 }
 
@@ -87,16 +101,6 @@ class EditPage extends React.Component {
 
     const loadAudio = (file) => {
 
-      wavesurfer = WaveForm.create({
-        container: '#waveform',
-        waveColor: 'green',
-        progressColor: 'white',
-        backgroundColor: 'black',
-        splitChannels: true,
-        height: 128
-
-      });
-
       wavesurfer.on('ready', function () {
         //wavesurfer.play();
 
@@ -114,8 +118,12 @@ class EditPage extends React.Component {
 
 
       wavesurfer.loadBlob(file)
-
     }
+
+    const play = () => {wavesurfer.play()}
+    const pause = () => {wavesurfer.pause()}
+    const stop = () => {wavesurfer.stop()}
+    const fastForward = () => {wavesurfer.skipForward()}
 
 
     return (
@@ -154,6 +162,13 @@ class EditPage extends React.Component {
                       <Spin spinning={edit.isLoading} indicator={antIcon} />
                     </Col>
                   </Upload>
+
+                  <ButtonGroup>
+                    <Button icon="play-circle" onClick={play}/>
+                    <Button icon="pause-circle" onClick={pause}/>
+                    <Button icon="stop" onClick={stop}/>
+                    <Button icon="fast-forward" onClick={fastForward}/>
+                  </ButtonGroup>
 
                 </Row>
               </WrapperRelative>
