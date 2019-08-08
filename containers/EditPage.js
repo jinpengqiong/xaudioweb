@@ -58,20 +58,6 @@ const tt5 = () => {
   });
 
 
-  wavesurfer = WaveForm.create({
-    container: '#waveform',
-    waveColor: 'green',
-    progressColor: 'white',
-    backgroundColor: 'black',
-    splitChannels: true,
-    height: 256
-
-  });
-
-  wavesurfer.on('ready', function () {
-    wavesurfer.play();
-  });
-
   //wavesurfer.load('static/cc.mp3');
 }
 
@@ -100,8 +86,35 @@ class EditPage extends React.Component {
 
 
     const loadAudio = (file) => {
+
+      wavesurfer = WaveForm.create({
+        container: '#waveform',
+        waveColor: 'green',
+        progressColor: 'white',
+        backgroundColor: 'black',
+        splitChannels: true,
+        height: 128
+
+      });
+
+      wavesurfer.on('ready', function () {
+        //wavesurfer.play();
+
+        console.log("0000000000000000000000000000: ", wavesurfer.getNumOfChannels())
+        if (wavesurfer.getNumOfChannels() == 1) {
+          console.log("11111111111111ffffffffffffffffffffffffff", window.innerHeight);
+          //wavesurfer.setHeight(256) 
+          wavesurfer.setHeight(window.innerHeight * 0.5)
+        } else {
+          wavesurfer.setHeight(window.innerHeight * 0.5 * 0.5)
+        }
+
+
+      });
+
+
       wavesurfer.loadBlob(file)
-      //edit.openFile(file)
+
     }
 
 

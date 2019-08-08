@@ -379,6 +379,10 @@ export default class WaveForm extends utils.Observer {
     return this.params.height;
   }
 
+  getNumOfChannels() {
+    return this.backend.getNumOfChannels();
+  }
+
   setHeight(height) {
     this.params.height = height;
     this.drawer.setHeight(height * this.params.pixelRatio);
@@ -466,7 +470,6 @@ export default class WaveForm extends utils.Observer {
   }
 
   loadBlob(blob) {
-    console.log("9999999999999999", blob);
     // Create file reader
     const reader = new FileReader();
     reader.addEventListener('progress', e => this.onProgress(e));

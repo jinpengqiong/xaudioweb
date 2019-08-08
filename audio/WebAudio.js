@@ -255,6 +255,11 @@ export default class WebAudio extends utils.Observer {
     this.peaks = peaks;
   }
 
+  getNumOfChannels() {
+    //console.log("pppppppppppppppppppp", this.buffer);
+    return this.buffer ? this.buffer.numberOfChannels : 1;
+  }
+
   setLength(length) {
     // No resize, we can preserve the cached peaks.
     if (this.mergedPeaks && length == 2 * this.mergedPeaks.length - 1 + 2) {
