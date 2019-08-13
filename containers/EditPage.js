@@ -77,7 +77,7 @@ const tt5 = () => {
 
   wavesurfer = WaveForm.create({
     container: '#waveform',
-    waveColor: 'green',
+    waveColor: 'blue',
     progressColor: 'white',
     backgroundColor: 'black',
     splitChannels: true,
@@ -114,12 +114,12 @@ const tt5 = () => {
         //]
       //}),
 
-      //SpectrumPlugin.create({
-        //wavesurfer: wavesurfer,
-        //container: "#wave-spectrogram",
-        //labels: true,
-        //colorMap: colorMap
-      //}),
+      SpectrumPlugin.create({
+        wavesurfer: wavesurfer,
+        container: "#wave-spectrogram",
+        labels: true,
+        colorMap: colorMap
+      }),
 
     ]
 
