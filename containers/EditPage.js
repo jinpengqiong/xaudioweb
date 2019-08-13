@@ -15,7 +15,12 @@ import langmap from '../config/langmap';
 
 import CanvasWave from '../components/CanvasWave';
 import WaveForm from '../audio/WaveForm';
+import CursorPlugin from '../audio/plugin/cursor';
+import TimelinePlugin from '../audio/plugin/timeline';
+//import RegionsPlugin from '../audio/plugin/regions';
+import SpectrumPlugin from '../audio/plugin/spectrogram';
 import CommonWrapper from '../components/CommonWrapper';
+import * as utils from '../utils';
 
 import { fabric } from 'fabric';
 
@@ -50,6 +55,17 @@ const TT4 = () => {
 }
 
 var wavesurfer = null
+var colorMap = null
+
+const loadColorMap = () => {
+  WaveForm.util
+  .fetchFile({ url: 'static/hot-colormap.json', responseType: 'json' })
+  .on('success', cmap => {
+    colorMap = cmap 
+    console.log("00000llllllllppppppppppppp1111111111111", colorMap);
+    tt5();
+  });
+}
 
 const tt5 = () => {
   const aa = new CommonWrapper({
@@ -65,7 +81,47 @@ const tt5 = () => {
     progressColor: 'white',
     backgroundColor: 'black',
     splitChannels: true,
-    height: 128
+    height: 128,
+    plugins: [
+      CursorPlugin.create({
+        showTime: true,
+        opacity: 1,
+        customShowTimeStyle: {
+          'background-color': '#000',
+          color: '#fff',
+          padding: '2px',
+          'font-size': '10px'
+        }
+      }),
+
+      TimelinePlugin.create({
+        container: "#wave-timeline"
+      }),
+
+
+      //RegionsPlugin.create({
+        //regions: [
+          //{
+          //start: 0,
+          //end: 5,
+          //color: 'hsla(400, 100%, 30%, 0.1)'
+        //},
+        //{
+          //start: 10,
+          //end: 100,
+          //color: 'hsla(200, 50%, 70%, 0.1)'
+        //}
+        //]
+      //}),
+
+      //SpectrumPlugin.create({
+        //wavesurfer: wavesurfer,
+        //container: "#wave-spectrogram",
+        //labels: true,
+        //colorMap: colorMap
+      //}),
+
+    ]
 
   });
 
@@ -89,7 +145,8 @@ class EditPage extends React.Component {
 
     //TT4();
 
-    tt5();
+    loadColorMap();
+    //tt5();
   }
 
   componentWillUnmount() {}
@@ -118,6 +175,23 @@ class EditPage extends React.Component {
 
 
       wavesurfer.loadBlob(file)
+
+      //document.querySelector('#slider').oninput = function () {
+        //wavesurfer.zoom(Number(this.value));
+      //};
+
+      //var slider = document.querySelector('[data-action="zoom"]');
+
+      //slider.value = wavesurfer.params.minPxPerSec;
+      //slider.min = wavesurfer.params.minPxPerSec;
+
+      //slider.addEventListener('input', function() {
+        //wavesurfer.zoom(Number(this.value));
+      //});
+
+      //wavesurfer.zoom(slider.value);
+
+
     }
 
     const play = () => {wavesurfer.play()}
@@ -139,9 +213,11 @@ class EditPage extends React.Component {
                 <CommonNoteTip lang={lang}/>
               </Row>
               <WrapperRelative top={"0px"} left={"1px"}>
+                <div id="wave-timeline"/>
                 <div id="hhh">
                   <div id="waveform"/>
                 </div>
+                <div id ="wave-spectrogram"/>
                 <Row>
                   <Col span={20} offset={0}>
                   <CanvasBg/>

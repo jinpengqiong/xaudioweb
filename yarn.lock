@@ -1535,6 +1535,12 @@ color-name@1.1.3:
   version "1.1.3"
   resolved "http://registry.npm.taobao.org/color-name/download/color-name-1.1.3.tgz#a7d0558bd89c42f795dd42328f740831ca53bc25"
 
+colormap@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.npm.taobao.org/colormap/download/colormap-2.3.1.tgz#9f2ab643591c0728d32332d5480b2487a4e0f249"
+  dependencies:
+    lerp "^1.0.3"
+
 combined-stream@^1.0.6, combined-stream@~1.0.6:
   version "1.0.7"
   resolved "http://registry.npm.taobao.org/combined-stream/download/combined-stream-1.0.7.tgz#2d1d24317afb8abe95d6d2c0b07b57813539d828"
@@ -2988,6 +2994,10 @@ launch-editor@2.2.1:
   dependencies:
     chalk "^2.3.0"
     shell-quote "^1.6.1"
+
+lerp@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npm.taobao.org/lerp/download/lerp-1.0.3.tgz#a18c8968f917896de15ccfcc28d55a6b731e776e"
 
 less-loader@4.1.0:
   version "4.1.0"

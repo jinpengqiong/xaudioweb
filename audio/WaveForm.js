@@ -3,6 +3,14 @@ import WebAudio from './WebAudio';
 import WaveCanvasGroup from './WaveCanvasGroup';
 import PeakCache from './PeakCache';
 
+
+class PluginClass {
+    create(params) {}
+    constructor(params, ws) {}
+    init() {}
+    destroy() {}
+}
+
 export default class WaveForm extends utils.Observer {
   defaultParams = {
     audioContext: null,
@@ -28,6 +36,7 @@ export default class WaveForm extends utils.Observer {
     normalize: false,
     partialRender: false,
     pixelRatio: window.devicePixelRatio || screen.deviceXDPI / screen.logicalXDPI,
+    plugins: [],
     progressColor: '#555',
     responsive: false,
     rtl: false,
@@ -42,6 +51,21 @@ export default class WaveForm extends utils.Observer {
     const waveform = new WaveForm(params);
     return waveform.init();
   }
+
+
+  util = utils;
+
+    /**
+     * Functions in the `util` property are available as a static property of the
+     * WaveSurfer class
+     *
+     * @type {Object}
+     * @example
+     * WaveSurfer.util.style(myElement, { background: 'blue' });
+     */
+  static util = utils;
+
+
 
   constructor(params) {
     super();
@@ -90,6 +114,7 @@ export default class WaveForm extends utils.Observer {
         this.Drawer = WaveCanvasGroup; 
         this.Backend = WebAudio;
 
+        this.initialisedPluginList = {};
         this.isDestroyed = false;
 
         this.isReady = false;
@@ -117,11 +142,99 @@ export default class WaveForm extends utils.Observer {
   }
 
   init() {
+    this.registerPlugins(this.params.plugins);
+
     this.createDrawer();
     this.createBackend();
     this.createPeakCache();
     return this;
   }
+
+  registerPlugins(plugins) {
+    plugins.forEach(plugin => this.addPlugin(plugin));
+
+    plugins.forEach(plugin => {
+      if (!plugin.deferInit) {
+        this.initPlugin(plugin.name);
+      }
+    });
+    this.fireEvent('plugins-registered', plugins);
+    return this;
+  }
+
+  getActivePlugins() {
+    return this.initialisedPluginList;
+  }
+
+  addPlugin(plugin) {
+    if (!plugin.name) {
+      throw new Error('Plugin does not have a name!');
+    }
+    if (!plugin.instance) {
+      throw new Error(
+        `Plugin ${plugin.name} does not have an instance property!`
+      );
+    }
+
+    if (plugin.staticProps) {
+      Object.keys(plugin.staticProps).forEach(pluginStaticProp => {
+        this[pluginStaticProp] = plugin.staticProps[pluginStaticProp];
+      });
+    }
+
+    const Instance = plugin.instance;
+
+    const observerPrototypeKeys = Object.getOwnPropertyNames(
+      utils.Observer.prototype
+    );
+    observerPrototypeKeys.forEach(key => {
+      Instance.prototype[key] = utils.Observer.prototype[key];
+    });
+
+    this[plugin.name] = new Instance(plugin.params || {}, this);
+    this.fireEvent('plugin-added', plugin.name);
+    return this;
+  }
+
+  initPlugin(name) {
+    if (!this[name]) {
+      throw new Error(`Plugin ${name} has not been added yet!`);
+    }
+    if (this.initialisedPluginList[name]) {
+      // destroy any already initialised plugins
+      this.destroyPlugin(name);
+    }
+    this[name].init();
+    this.initialisedPluginList[name] = true;
+    this.fireEvent('plugin-initialised', name);
+    return this;
+  }
+
+  destroyPlugin(name) {
+    if (!this[name]) {
+      throw new Error(
+        `Plugin ${name} has not been added yet and cannot be destroyed!`
+      );
+    }
+    if (!this.initialisedPluginList[name]) {
+      throw new Error(
+        `Plugin ${name} is not active and cannot be destroyed!`
+      );
+    }
+    if (typeof this[name].destroy !== 'function') {
+      throw new Error(`Plugin ${name} does not have a destroy function!`);
+    }
+
+    this[name].destroy();
+    delete this.initialisedPluginList[name];
+    this.fireEvent('plugin-destroyed', name);
+    return this;
+  }
+
+  destroyAllPlugins() {
+    Object.keys(this.initialisedPluginList).forEach(name => this.destroyPlugin(name));
+  }
+
 
   createDrawer() {
     this.drawer = new this.Drawer(this.container, this.params);
@@ -607,6 +720,8 @@ export default class WaveForm extends utils.Observer {
   }
 
   destroy() {
+    this.destroyAllPlugins();
+
     this.fireEvent('destroy');
     this.cancelAjax();
     this.clearTmpEvents();
