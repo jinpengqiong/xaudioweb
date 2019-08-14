@@ -184,6 +184,7 @@ export default class WaveForm extends utils.Observer {
 
     const Instance = plugin.instance;
 
+    //turn plugin instance into a observer
     const observerPrototypeKeys = Object.getOwnPropertyNames(
       utils.Observer.prototype
     );
