@@ -17,7 +17,7 @@ import CanvasWave from '../components/CanvasWave';
 import WaveForm from '../audio/WaveForm';
 import CursorPlugin from '../audio/plugin/cursor';
 import TimelinePlugin from '../audio/plugin/timeline';
-//import RegionsPlugin from '../audio/plugin/regions';
+import RegionsPlugin from '../audio/plugin/regions';
 import SpectrumPlugin from '../audio/plugin/spectrogram';
 import CommonWrapper from '../components/CommonWrapper';
 import * as utils from '../utils';
@@ -80,7 +80,7 @@ const tt5 = () => {
     waveColor: '#48db95', //'cyan', //'blue',
     //waveColor: 'blue', //'cyan', //'blue',
     progressColor: 'grey',//'white',
-    backgroundColor: 'black',
+    //backgroundColor: 'black',
     splitChannels: true,
     height: 128,
     plugins: [
@@ -100,27 +100,30 @@ const tt5 = () => {
       }),
 
 
-      //RegionsPlugin.create({
-        //regions: [
-          //{
-          //start: 0,
-          //end: 5,
-          //color: 'hsla(400, 100%, 30%, 0.1)'
-        //},
-        //{
-          //start: 10,
-          //end: 100,
-          //color: 'hsla(200, 50%, 70%, 0.1)'
-        //}
-        //]
-      //}),
-
-      SpectrumPlugin.create({
-        wavesurfer: wavesurfer,
-        container: "#wave-spectrogram",
-        labels: true,
-        colorMap: colorMap
+      RegionsPlugin.create({
+        regions: [
+          {
+          start: 0,
+          end: 5,
+          color: 'hsla(400, 100%, 30%, 0.1)'
+        },
+        {
+          start: 10,
+          end: 20,
+          color: 'hsla(200, 50%, 70%, 0.1)'
+        }
+        ],
+        dragSelection: {
+          slop: 5
+        }
       }),
+
+      //SpectrumPlugin.create({
+        //wavesurfer: wavesurfer,
+        //container: "#wave-spectrogram",
+        //labels: true,
+        //colorMap: colorMap
+      //}),
 
     ]
 

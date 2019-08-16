@@ -644,6 +644,7 @@ export default class RegionsPlugin {
         this.wavesurfer.Region = Region;
 
         this._onBackendCreated = () => {
+          console.log("tttttttttttttttttttttttttt");
             this.wrapper = this.wavesurfer.drawer.wrapper;
             if (this.params.regions) {
                 this.params.regions.forEach(region => {
@@ -665,6 +666,7 @@ export default class RegionsPlugin {
     }
 
     init() {
+      console.log("rrrrrrr11111111111111111111111111");
         // Check if ws is ready
         if (this.wavesurfer.isReady) {
             this._onBackendCreated();

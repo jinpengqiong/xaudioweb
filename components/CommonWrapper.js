@@ -15,7 +15,7 @@ class CommonWrapper {
 
     utils.style(this.container, {
       display: 'block',
-      backgroundColor: 'red',
+      //backgroundColor: 'red',
       position: 'relative',
       userSelect: 'none',
       webkitUserSelect: 'none',
