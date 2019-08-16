@@ -21,7 +21,7 @@ export default class WaveForm extends utils.Observer {
     barHeight: 1,
     barGap: null,
     container: null,
-    cursorColor: '#333',
+    cursorColor: 'red', //'#333',
     cursorWidth: 1,
     dragSelection: true,
     duration: null,

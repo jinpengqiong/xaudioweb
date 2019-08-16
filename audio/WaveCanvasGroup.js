@@ -34,6 +34,7 @@ export default class WaveCanvasGroup extends RectWrapper {
       width: '0',
       display: 'none',
       boxSizing: 'border-box',
+      //borderRightStyle: 'dashed',//'solid',
       borderRightStyle: 'solid',
       pointerEvents: 'none'
     })

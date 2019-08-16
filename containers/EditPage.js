@@ -78,7 +78,8 @@ const tt5 = () => {
   wavesurfer = WaveForm.create({
     container: '#waveform',
     waveColor: '#48db95', //'cyan', //'blue',
-    progressColor: 'white',
+    //waveColor: 'blue', //'cyan', //'blue',
+    progressColor: 'grey',//'white',
     backgroundColor: 'black',
     splitChannels: true,
     height: 128,
