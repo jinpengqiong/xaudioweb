@@ -587,14 +587,15 @@ export default class SectionPlugin {
         };
 
         // Id-based hash of regions
-        this.list = {};
+        //this.list = {};
         this._onReady = () => {
             if (this.params.dragSelection) {
                 this.enableDragSelection(this.params);
             }
-            Object.keys(this.list).forEach(id => {
-                this.list[id].updateRender();
-            });
+            //Object.keys(this.list).forEach(id => {
+                //this.list[id].updateRender();
+            //});
+            this.section.updateRender();
         };
     }
 
@@ -618,30 +619,33 @@ export default class SectionPlugin {
     }
 
     /**
-     * Add a region
+     * Add section 
      *
-     * @param {object} params Region parameters
-     * @return {Region} The created region
+     * @param {object} params Section parameters
+     * @return {Section} The created region
      */
     add(params) {
-        const region = new this.wavesurfer.Region(params, this.wavesurfer);
+        const section = new this.wavesurfer.Section(params, this.wavesurfer);
 
-        this.list[region.id] = region;
+        //this.list[region.id] = region;
+        this.section = section;
 
-        region.on('remove', () => {
-            delete this.list[region.id];
+        section.on('remove', () => {
+            //delete this.list[region.id];
+            this.section = null;
         });
 
-        return region;
+        return section;
     }
 
     /**
      * Remove all regions
      */
     clear() {
-        Object.keys(this.list).forEach(id => {
-            this.list[id].remove();
-        });
+        //Object.keys(this.list).forEach(id => {
+            //this.list[id].remove();
+        //});
+        this.section.remove();
     }
 
     enableDragSelection(params) {
@@ -655,7 +659,7 @@ export default class SectionPlugin {
         let duration = this.wavesurfer.getDuration();
         let maxScroll;
         let start;
-        let region;
+        let section;
         let touchId;
         let pxMove = 0;
         let scrollDirection;
@@ -663,7 +667,7 @@ export default class SectionPlugin {
 
         // Scroll when the user is dragging within the threshold
         const edgeScroll = e => {
-            if (!region || !scrollDirection) {
+            if (!section || !scrollDirection) {
                 return;
             }
 
@@ -677,7 +681,7 @@ export default class SectionPlugin {
 
             // Update range
             const end = this.wavesurfer.drawer.handleEvent(e);
-            region.update({
+            section.update({
                 start: Math.min(end * duration, start * duration),
                 end: Math.max(end * duration, start * duration)
             });
@@ -703,7 +707,7 @@ export default class SectionPlugin {
 
             drag = true;
             start = this.wavesurfer.drawer.handleEvent(e, true);
-            region = null;
+            section = null;
             scrollDirection = null;
         };
         this.wrapper.addEventListener('mousedown', eventDown);
@@ -722,13 +726,13 @@ export default class SectionPlugin {
             pxMove = 0;
             scrollDirection = null;
 
-            if (region) {
+            if (section) {
                 this.util.preventClick();
-                region.fireEvent('update-end', e);
-                this.wavesurfer.fireEvent('region-update-end', region, e);
+                section.fireEvent('update-end', e);
+                this.wavesurfer.fireEvent('section-update-end', section, e);
             }
 
-            region = null;
+            section = null;
         };
         this.wrapper.addEventListener('mouseup', eventUp);
         this.wrapper.addEventListener('touchend', eventUp);
@@ -757,18 +761,18 @@ export default class SectionPlugin {
                 return;
             }
 
-            if (!region) {
-                region = this.add(params || {});
+            if (!section) {
+                section = this.add(params || {});
             }
 
             const end = this.wavesurfer.drawer.handleEvent(e);
-            const startUpdate = this.wavesurfer.regions.util.getRegionSnapToGridValue(
+            const startUpdate = this.wavesurfer.section.util.getRegionSnapToGridValue(
                 start * duration
             );
-            const endUpdate = this.wavesurfer.regions.util.getRegionSnapToGridValue(
+            const endUpdate = this.wavesurfer.section.util.getRegionSnapToGridValue(
                 end * duration
             );
-            region.update({
+            section.update({
                 start: Math.min(endUpdate, startUpdate),
                 end: Math.max(endUpdate, startUpdate)
             });
@@ -807,20 +811,20 @@ export default class SectionPlugin {
      *
      * @returns {Region} The current region
      */
-    getCurrentRegion() {
-        const time = this.wavesurfer.getCurrentTime();
-        let min = null;
-        Object.keys(this.list).forEach(id => {
-            const cur = this.list[id];
-            if (cur.start <= time && cur.end >= time) {
-                if (!min || cur.end - cur.start < min.end - min.start) {
-                    min = cur;
-                }
-            }
-        });
+    //getCurrentRegion() {
+        //const time = this.wavesurfer.getCurrentTime();
+        //let min = null;
+        //Object.keys(this.list).forEach(id => {
+            //const cur = this.list[id];
+            //if (cur.start <= time && cur.end >= time) {
+                //if (!min || cur.end - cur.start < min.end - min.start) {
+                    //min = cur;
+                //}
+            //}
+        //});
 
-        return min;
-    }
+        //return min;
+    //}
 
     /**
      * Match the value to the grid, if required
