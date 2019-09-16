@@ -101,38 +101,17 @@ const tt5 = () => {
         container: "#wave-timeline"
       }),
 
-
-      //RegionsPlugin.create({
-        //regions: [
-          //{
-          //start: 0,
-          //end: 5,
-          //color: 'hsla(400, 100%, 30%, 0.1)'
-        //},
-        //{
+      SectionPlugin.create({
+        //section: {
           //start: 10,
           //end: 20,
-          //color: 'hsla(200, 50%, 70%, 0.1)'
-        //}
-        //],
-        //dragSelection: {
-          //slop: 5
-        //}
-      //}),
-
-
-      SectionPlugin.create({
-        section: {
-          start: 10,
-          end: 20,
-          color: 'hsla(190, 40%, 90%, 0.3)'
-          //color: 'blue'
-        },
+          //color: 'hsla(190, 40%, 90%, 0.3)'
+        //},
         dragSelection: {
           slop: 5
-        }
+        },
+        drag: false
       }),
-
 
 
       //SpectrumPlugin.create({

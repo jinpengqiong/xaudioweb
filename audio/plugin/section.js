@@ -16,7 +16,8 @@ class Section {
         this.resize =
             params.resize === undefined ? true : Boolean(params.resize);
         this.drag = params.drag === undefined ? true : Boolean(params.drag);
-        this.color = params.color || 'rgba(0, 0, 0, 0.1)';
+        //this.color = params.color || 'rgba(0, 0, 0, 0.1)';
+        this.color = params.color || 'hsla(190, 40%, 90%, 0.3)';
         this.data = params.data || {};
         this.attributes = params.attributes || {};
 
@@ -67,6 +68,7 @@ class Section {
         this.updateRender();
         this.fireEvent('update');
         this.wavesurfer.fireEvent('section-updated', this);
+        console.log("XXXXXXXXXXXXXXXXXXXXXX: ", this.drag);
     }
 
     /* Remove a single region. */
@@ -339,6 +341,7 @@ class Section {
                     ) {
                         return;
                     }
+                    console.log("222222221111111111111111111111", drag, "222222222:", resize);
 
                     if (drag || resize) {
                         const oldTime = startTime;
@@ -595,7 +598,9 @@ export default class SectionPlugin {
             //Object.keys(this.list).forEach(id => {
                 //this.list[id].updateRender();
             //});
-            this.section.updateRender();
+            if (this.section) {
+              this.section.updateRender();
+            }
         };
     }
 
@@ -625,6 +630,8 @@ export default class SectionPlugin {
      */
     add(params) {
         const section = new this.wavesurfer.Section(params, this.wavesurfer);
+        console.log("1111111111gggggggoooooo: ", params);
+        console.log("1111111111ggggggg: ", section);
 
         //this.list[region.id] = region;
         this.section = section;
@@ -644,7 +651,9 @@ export default class SectionPlugin {
         //Object.keys(this.list).forEach(id => {
             //this.list[id].remove();
         //});
-        this.section.remove();
+        if (this.section) {
+          this.section.remove();
+        }
     }
 
     enableDragSelection(params) {
@@ -746,21 +755,27 @@ export default class SectionPlugin {
         });
 
         const eventMove = e => {
+          console.log("******111111111111", drag);
             if (!drag) {
                 return;
             }
+          console.log("------2222222222111111111111", drag);
             if (++pxMove <= slop) {
                 return;
             }
 
+          console.log("------003333333332222222222111111111111", drag);
             if (e.touches && e.touches.length > 1) {
                 return;
             }
+          console.log("------113333333332222222222111111111111", drag);
             if (e.targetTouches && e.targetTouches[0].identifier != touchId) {
                 return;
             }
 
+          console.log("------3333333332222222222111111111111", drag);
             if (!section) {
+                this.clear();
                 section = this.add(params || {});
             }
 
