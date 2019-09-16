@@ -579,10 +579,10 @@ export default class SectionPlugin {
         this.wavesurfer.Section = Section;
 
         this._onBackendCreated = () => {
-          console.log("tttttttttttttttttttttttttt");
+            console.log("tttttttttttttttttttttttttt9999999999999" );
             this.wrapper = this.wavesurfer.drawer.wrapper;
             if (this.params.section) {
-                this.add(section);
+                this.add(this.params.section);
             }
         };
 
@@ -600,7 +600,6 @@ export default class SectionPlugin {
     }
 
     init() {
-      console.log("rrrrrrr11111111111111111111111111");
         // Check if ws is ready
         if (this.wavesurfer.isReady) {
             this._onBackendCreated();

@@ -18,6 +18,7 @@ import WaveForm from '../audio/WaveForm';
 import CursorPlugin from '../audio/plugin/cursor';
 import TimelinePlugin from '../audio/plugin/timeline';
 import RegionsPlugin from '../audio/plugin/regions';
+import SectionPlugin from '../audio/plugin/section';
 import SpectrumPlugin from '../audio/plugin/spectrogram';
 import CommonWrapper from '../components/CommonWrapper';
 import * as utils from '../utils';
@@ -79,8 +80,9 @@ const tt5 = () => {
     container: '#waveform',
     waveColor: '#48db95', //'cyan', //'blue',
     //waveColor: 'blue', //'cyan', //'blue',
-    progressColor: 'grey',//'white',
-    //backgroundColor: 'black',
+    //progressColor: 'grey',//'white',
+    progressColor: '#48db95',//'white',
+    backgroundColor: 'black',
     splitChannels: true,
     height: 128,
     plugins: [
@@ -100,23 +102,38 @@ const tt5 = () => {
       }),
 
 
-      RegionsPlugin.create({
-        regions: [
-          {
-          start: 0,
-          end: 5,
-          color: 'hsla(400, 100%, 30%, 0.1)'
-        },
-        {
+      //RegionsPlugin.create({
+        //regions: [
+          //{
+          //start: 0,
+          //end: 5,
+          //color: 'hsla(400, 100%, 30%, 0.1)'
+        //},
+        //{
+          //start: 10,
+          //end: 20,
+          //color: 'hsla(200, 50%, 70%, 0.1)'
+        //}
+        //],
+        //dragSelection: {
+          //slop: 5
+        //}
+      //}),
+
+
+      SectionPlugin.create({
+        section: {
           start: 10,
           end: 20,
-          color: 'hsla(200, 50%, 70%, 0.1)'
-        }
-        ],
+          color: 'hsla(190, 40%, 90%, 0.3)'
+          //color: 'blue'
+        },
         dragSelection: {
           slop: 5
         }
       }),
+
+
 
       //SpectrumPlugin.create({
         //wavesurfer: wavesurfer,
@@ -130,6 +147,7 @@ const tt5 = () => {
   });
 
 
+  console.log("mmmmmmmmmmmmmmm----", wavesurfer);
 
 
   //wavesurfer.load('static/cc.mp3');
