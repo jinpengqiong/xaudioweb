@@ -68,7 +68,6 @@ class Section {
         this.updateRender();
         this.fireEvent('update');
         this.wavesurfer.fireEvent('section-updated', this);
-        console.log("XXXXXXXXXXXXXXXXXXXXXX: ", this.drag);
     }
 
     /* Remove a single region. */
@@ -283,7 +282,7 @@ class Section {
                     // stop the event propagation, if this section is resizable or draggable
                     // and the event is therefore handled here.
                     if (this.drag || this.resize) {
-                        e.stopPropagation();
+                          //e.stopPropagation();
                     }
 
                     // Store the selected startTime we begun dragging or resizing
@@ -310,6 +309,7 @@ class Section {
                         drag = true;
                         resize = false;
                     }
+                    this.resizeStatus = resize;
                 };
                 const onUp = e => {
                     if (e.touches && e.touches.length > 1) {
@@ -320,6 +320,7 @@ class Section {
                         drag = false;
                         scrollDirection = null;
                         resize = false;
+                        this.resizeStatus = resize;
                     }
 
                     if (updated) {
@@ -341,7 +342,6 @@ class Section {
                     ) {
                         return;
                     }
-                    console.log("222222221111111111111111111111", drag, "222222222:", resize);
 
                     if (drag || resize) {
                         const oldTime = startTime;
@@ -582,7 +582,6 @@ export default class SectionPlugin {
         this.wavesurfer.Section = Section;
 
         this._onBackendCreated = () => {
-            console.log("tttttttttttttttttttttttttt9999999999999" );
             this.wrapper = this.wavesurfer.drawer.wrapper;
             if (this.params.section) {
                 this.add(this.params.section);
@@ -630,8 +629,6 @@ export default class SectionPlugin {
      */
     add(params) {
         const section = new this.wavesurfer.Section(params, this.wavesurfer);
-        console.log("1111111111gggggggoooooo: ", params);
-        console.log("1111111111ggggggg: ", section);
 
         //this.list[region.id] = region;
         this.section = section;
@@ -706,6 +703,12 @@ export default class SectionPlugin {
             if (e.touches && e.touches.length > 1) {
                 return;
             }
+
+            if (this.section) {
+              if (this.section.resizeStatus == 'start' || this.section.resizeStatus == 'end')
+                return;
+            }
+
             duration = this.wavesurfer.getDuration();
             touchId = e.targetTouches ? e.targetTouches[0].identifier : null;
 
@@ -715,7 +718,11 @@ export default class SectionPlugin {
 
             drag = true;
             start = this.wavesurfer.drawer.handleEvent(e, true);
-            section = null;
+
+            if (this.section) {
+              this.section.remove();
+              section = null;
+            }
             scrollDirection = null;
         };
         this.wrapper.addEventListener('mousedown', eventDown);
@@ -755,25 +762,19 @@ export default class SectionPlugin {
         });
 
         const eventMove = e => {
-          console.log("******111111111111", drag);
             if (!drag) {
                 return;
             }
-          console.log("------2222222222111111111111", drag);
             if (++pxMove <= slop) {
                 return;
             }
-
-          console.log("------003333333332222222222111111111111", drag);
             if (e.touches && e.touches.length > 1) {
                 return;
             }
-          console.log("------113333333332222222222111111111111", drag);
             if (e.targetTouches && e.targetTouches[0].identifier != touchId) {
                 return;
             }
 
-          console.log("------3333333332222222222111111111111", drag);
             if (!section) {
                 this.clear();
                 section = this.add(params || {});
