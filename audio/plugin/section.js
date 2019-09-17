@@ -262,7 +262,7 @@ class Section {
                     startTime = time;
 
                     // Continue dragging or resizing
-                    drag ? this.onDrag(delta) : this.onResize(delta, resize);
+                    drag ? this.onDrag(delta) : this.onResize(time, delta, resize);
 
                     // Repeat
                     window.requestAnimationFrame(() => {
@@ -289,6 +289,9 @@ class Section {
                     startTime = this.wavesurfer.section.util.getRegionSnapToGridValue(
                         this.wavesurfer.drawer.handleEvent(e, true) * duration
                     );
+
+                    this.startLimited = this.start;
+                    this.endLimited = this.end;
 
                     // Store for scroll calculations
                     maxScroll =
@@ -323,6 +326,9 @@ class Section {
                         this.resizeStatus = resize;
                     }
 
+                    this.startLimited = this.start;
+                    this.endLimited = this.end;
+
                     if (updated) {
                         updated = false;
                         this.util.preventClick();
@@ -331,6 +337,7 @@ class Section {
                     }
                 };
                 const onMove = e => {
+                  console.log("###################1111111111111111111111111111111111111");
                     const duration = this.wavesurfer.getDuration();
 
                     if (e.touches && e.touches.length > 1) {
@@ -344,6 +351,7 @@ class Section {
                     }
 
                     if (drag || resize) {
+                      console.log("iiiii---startTime: ", startTime);
                         const oldTime = startTime;
                         const time = this.wavesurfer.section.util.getRegionSnapToGridValue(
                             this.wavesurfer.drawer.handleEvent(e) * duration
@@ -361,7 +369,7 @@ class Section {
                         // Resize
                         if (this.resize && resize) {
                             updated = updated || !!delta;
-                            this.onResize(delta, resize);
+                            this.onResize(time, delta, resize);
                         }
 
                         if (
@@ -451,16 +459,23 @@ class Section {
         });
     }
 
-    onResize(delta, direction) {
+    onResize(time, delta, direction) {
+      console.log("delta: ", delta, ", direction: ", direction);
+      console.log("start: ", this.start, ", end: ", this.end);
+      console.log("startLimited: ", this.startLimited, ", endLimited: ", this.endLimited);
         if (direction == 'start') {
             this.update({
-                start: Math.min(this.start + delta, this.end),
-                end: Math.max(this.start + delta, this.end)
+                //start: Math.min(Math.min(this.start + delta, this.end), this.endLimited),
+                //end: Math.max(Math.max(this.start + delta, this.end), time)
+                start: Math.min(time, this.endLimited),
+                end: Math.max(time, this.endLimited)
             });
         } else {
             this.update({
-                start: Math.min(this.end + delta, this.start),
-                end: Math.max(this.end + delta, this.start)
+                //start: Math.min(time, Math.min(this.end + delta, this.start)),
+                //end: Math.max(Math.max(this.end + delta, this.start), this.startLimited)
+                start: Math.min(time, this.startLimited),
+                end: Math.max(time, this.startLimited)
             });
         }
     }
@@ -762,6 +777,7 @@ export default class SectionPlugin {
         });
 
         const eventMove = e => {
+                  console.log("###################2222222222222222222222222");
             if (!drag) {
                 return;
             }
@@ -787,6 +803,9 @@ export default class SectionPlugin {
             const endUpdate = this.wavesurfer.section.util.getRegionSnapToGridValue(
                 end * duration
             );
+
+            console.log("---start: ", start, "----end: ", end);
+            console.log("---startUpdate: ", startUpdate, "----endUpdate: ", endUpdate);
             section.update({
                 start: Math.min(endUpdate, startUpdate),
                 end: Math.max(endUpdate, startUpdate)
