@@ -337,7 +337,6 @@ class Section {
                     }
                 };
                 const onMove = e => {
-                  console.log("###################1111111111111111111111111111111111111");
                     const duration = this.wavesurfer.getDuration();
 
                     if (e.touches && e.touches.length > 1) {
@@ -351,7 +350,6 @@ class Section {
                     }
 
                     if (drag || resize) {
-                      console.log("iiiii---startTime: ", startTime);
                         const oldTime = startTime;
                         const time = this.wavesurfer.section.util.getRegionSnapToGridValue(
                             this.wavesurfer.drawer.handleEvent(e) * duration
@@ -460,9 +458,9 @@ class Section {
     }
 
     onResize(time, delta, direction) {
-      console.log("delta: ", delta, ", direction: ", direction);
-      console.log("start: ", this.start, ", end: ", this.end);
-      console.log("startLimited: ", this.startLimited, ", endLimited: ", this.endLimited);
+        console.log("delta: ", delta, ", direction: ", direction);
+        console.log("start: ", this.start, ", end: ", this.end);
+        console.log("startLimited: ", this.startLimited, ", endLimited: ", this.endLimited);
         if (direction == 'start') {
             this.update({
                 //start: Math.min(Math.min(this.start + delta, this.end), this.endLimited),
@@ -478,6 +476,7 @@ class Section {
                 end: Math.max(time, this.startLimited)
             });
         }
+        console.log("now real start: ", this.start, ", real end: ", this.end);
     }
 }
 
