@@ -68,6 +68,11 @@ const loadColorMap = () => {
   });
 }
 
+const exportRenderBuffer = () => {
+  wavesurfer.exportRenderBuffer();
+}
+
+
 const tt5 = () => {
   const aa = new CommonWrapper({
     id: '#hhh',
@@ -246,6 +251,10 @@ class EditPage extends React.Component {
                     <Button icon="stop" onClick={stop}/>
                     <Button icon="fast-forward" onClick={fastForward}/>
                   </ButtonGroup>
+
+                  <Button onClick={exportRenderBuffer}>
+                    export
+                  </Button>
 
                 </Row>
               </WrapperRelative>

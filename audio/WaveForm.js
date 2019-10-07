@@ -696,6 +696,17 @@ export default class WaveForm extends utils.Observer {
     return this.drawer.getImage(format, quality, type);
   }
 
+  exportRenderBuffer() {
+    console.log("11111111111: ", this.backend);
+    this.backend.exportRenderBuffer()
+    .then(function(buffer) {
+      console.log("wavesurfer render buffer: ", buffer);
+    })
+    .catch(e => {
+      console.log("------------", e);
+    })
+  }
+
   cancelAjax() {
     if (this.currentRequest && this.currentRequest.controller) {
       this.currentRequest.controller.abort();

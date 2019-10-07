@@ -236,12 +236,13 @@ export default class WebAudio extends utils.Observer {
   }
 
   decodeArrayBuffer(arraybuffer, callback, errback) {
-    if (!this.offlineAc) {
-      this.offlineAc = this.getOfflineAudioContext(
-        this.ac && this.ac.sampleRate ? this.ac.sampleRate : 44100
-      );
-    }
-    this.offlineAc.decodeAudioData(
+    //if (!this.offlineAc) {
+      //this.offlineAc = this.getOfflineAudioContext(
+        //this.ac && this.ac.sampleRate ? this.ac.sampleRate : 44100
+      //);
+    //}
+    //this.offlineAc.decodeAudioData(
+    this.ac.decodeAudioData(
       arraybuffer,
       data => callback(data),
       errback
@@ -402,9 +403,42 @@ export default class WebAudio extends utils.Observer {
     this.createSource();
   }
 
+  exportRenderBuffer() {
+    console.log("2222222222", this.offlineSource.buffer);
+
+    this.offlineGainNode.gain.setValueAtTime(3, this.offlineAc.currentTime);
+
+    this.offlineSource.start();
+    console.log("333333333", this.offlineSource.buffer);
+    var self = this
+
+
+    return this.offlineAc.startRendering()
+    .then(function(renderBuffer) {
+      console.log("-----> buffer render: ", renderBuffer);
+      console.log("data raw-->", self.offlineSource.buffer.getChannelData(0));
+      console.log("data render-->", renderBuffer.getChannelData(0));
+
+      return renderBuffer;
+    })
+  }
+
   createSource() {
     this.disconnectSource();
     this.source = this.ac.createBufferSource();
+
+    console.log("999999999999: ", this.buffer);
+    this.offlineAc = new window.OfflineAudioContext(2, 44100*150, 44100);
+
+
+    this.offlineSource = this.offlineAc.createBufferSource();
+    this.offlineSource.buffer = this.buffer;
+
+    this.offlineGainNode = this.offlineAc.createGain();
+
+    this.offlineSource.connect(this.offlineGainNode);
+    this.offlineGainNode.connect(this.offlineAc.destination);
+
 
     // adjust for old browsers
     this.source.start = this.source.start || this.source.noteGrainOn;
@@ -470,6 +504,8 @@ export default class WebAudio extends utils.Observer {
     if (!this.buffer) {
       return;
     }
+
+    console.log("888888888888: ", this.buffer);
 
     // need to re-create source on each playback
     this.createSource();
