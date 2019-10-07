@@ -73,6 +73,7 @@ export default class WebAudio extends utils.Observer {
     this.ac =
       params.audioContext ||
       (this.supportsWebAudio() ? this.getAudioContext() : {});
+    this.offlineAc = null;
     this.lastPlay = this.ac.currentTime;
     this.startPosition = 0;
     this.scheduledPause = null;
@@ -98,9 +99,9 @@ export default class WebAudio extends utils.Observer {
   }
 
   init() {
-    this.createVolumeNode();
-    this.createScriptNode();
-    this.createAnalyserNode();
+    //this.createVolumeNode();
+    //this.createScriptNode();
+    //this.createAnalyserNode();
 
     this.setState(PAUSED);
     this.setPlaybackRate(this.params.audioRate);
@@ -183,23 +184,24 @@ export default class WebAudio extends utils.Observer {
   }
 
   removeOnAudioProcess() {
-    this.scriptNode.onaudioprocess = () => {};
+    if (this.scriptNode)
+      this.scriptNode.onaudioprocess = () => {};
   }
 
   createAnalyserNode() {
-    this.analyser = this.ac.createAnalyser();
+    this.analyser = this.offlineAc.createAnalyser();
     this.analyser.connect(this.gainNode);
   }
 
   createVolumeNode() {
     // Create gain node using the AudioContext
-    if (this.ac.createGain) {
-      this.gainNode = this.ac.createGain();
+    if (this.offlineAc.createGain) {
+      this.gainNode = this.offlineAc.createGain();
     } else {
-      this.gainNode = this.ac.createGainNode();
+      this.gainNode = this.offlineAc.createGainNode();
     }
     // Add the gain node to the graph
-    this.gainNode.connect(this.ac.destination);
+    this.gainNode.connect(this.offlineAc.destination);
   }
 
   setSinkId(deviceId) {
@@ -400,7 +402,7 @@ export default class WebAudio extends utils.Observer {
     this.startPosition = 0;
     this.lastPlay = this.ac.currentTime;
     this.buffer = buffer;
-    this.createSource();
+    return this.createSource();
   }
 
   exportRenderBuffer() {
@@ -425,22 +427,72 @@ export default class WebAudio extends utils.Observer {
 
   createSource() {
     this.disconnectSource();
-    this.source = this.ac.createBufferSource();
+
 
     console.log("999999999999: ", this.buffer);
-    this.offlineAc = new window.OfflineAudioContext(2, 44100*150, 44100);
 
+    //create offline audio context graph, gain node, scripte node, analyser node
+    this.offlineAc = new window.OfflineAudioContext(this.buffer.numberOfChannels, this.buffer.sampleRate*(parseInt(this.buffer.duration)+1), this.buffer.sampleRate);
 
+    this.createVolumeNode();
+    this.createScriptNode();
+    this.createAnalyserNode();
+
+    //crate offline source
     this.offlineSource = this.offlineAc.createBufferSource();
     this.offlineSource.buffer = this.buffer;
 
-    this.offlineGainNode = this.offlineAc.createGain();
+    //this.offlineGainNode = this.offlineAc.createGain();
 
-    this.offlineSource.connect(this.offlineGainNode);
-    this.offlineGainNode.connect(this.offlineAc.destination);
+    //this.offlineSource.connect(this.offlineGainNode);
+    //this.offlineGainNode.connect(this.offlineAc.destination);
+
+    this.offlineSource.start();
+
+    let self = this
+
+    return this.offlineAc.startRendering()
+    .then(function(renderBuffer) {
+      //console.log("-----> buffer render: ", renderBuffer);
+      //console.log("data raw-->", self.offlineSource.buffer.getChannelData(0));
+      //console.log("data render-->", renderBuffer.getChannelData(0));
+
+      self.source = self.ac.createBufferSource();
+
+      self.source.start = self.source.start || self.source.noteGrainOn;
+      self.source.stop = self.source.stop || self.source.noteOff;
+
+      self.source.playbackRate.setValueAtTime(
+        self.playbackRate,
+        self.ac.currentTime
+      );
+      self.source.buffer = self.buffer;
+      self.source.connect(self.ac.destination);
+      //self.source.connect(self.analyser);
+
+      return renderBuffer;
+    })
 
 
-    // adjust for old browsers
+    //this.source = this.ac.createBufferSource();
+
+    //this.source.start = this.source.start || this.source.noteGrainOn;
+    //this.source.stop = this.source.stop || this.source.noteOff;
+
+    //this.source.playbackRate.setValueAtTime(
+      //this.playbackRate,
+      //this.ac.currentTime
+    //);
+    //this.source.buffer = this.buffer;
+    //this.source.connect(this.analyser);
+
+  }
+
+  createPlaySource() {
+    this.disconnectSource();
+
+    this.source = this.ac.createBufferSource();
+
     this.source.start = this.source.start || this.source.noteGrainOn;
     this.source.stop = this.source.stop || this.source.noteOff;
 
@@ -449,7 +501,8 @@ export default class WebAudio extends utils.Observer {
       this.ac.currentTime
     );
     this.source.buffer = this.buffer;
-    this.source.connect(this.analyser);
+    this.source.connect(this.ac.destination);
+
   }
 
   isPaused() {
@@ -508,7 +561,8 @@ export default class WebAudio extends utils.Observer {
     console.log("888888888888: ", this.buffer);
 
     // need to re-create source on each playback
-    this.createSource();
+    //this.createSource();
+    this.createPlaySource();
 
     const adjustedTime = this.seekTo(start, end);
 

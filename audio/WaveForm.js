@@ -577,10 +577,12 @@ export default class WaveForm extends utils.Observer {
   }
 
   loadDecodedBuffer(buffer) {
-    this.backend.load(buffer);
-    this.drawBuffer();
-    this.fireEvent('ready');
-    this.isReady = true;
+    this.backend.load(buffer)
+    .then(renderBuffer => {
+      this.drawBuffer();
+      this.fireEvent('ready');
+      this.isReady = true;
+    });
   }
 
   loadBlob(blob) {
