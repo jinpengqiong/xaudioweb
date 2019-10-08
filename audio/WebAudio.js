@@ -84,8 +84,10 @@ export default class WebAudio extends utils.Observer {
     };
     this.analyser = null;
     this.buffer = null;
+    this.renderBuffer = null;
     this.filters = [];
     this.gainNode = null;
+    this.gainProcessNode = null;
     this.mergedPeaks = null;
     this.offlineAc = null;
     this.peaks = null;
@@ -99,9 +101,9 @@ export default class WebAudio extends utils.Observer {
   }
 
   init() {
-    //this.createVolumeNode();
-    //this.createScriptNode();
-    //this.createAnalyserNode();
+    this.createScriptNode();
+    this.createVolumeNode();
+    this.createAnalyserNode();
 
     this.setState(PAUSED);
     this.setPlaybackRate(this.params.audioRate);
@@ -151,6 +153,7 @@ export default class WebAudio extends utils.Observer {
     }
   }
 
+  //for play and show time line, after gain node, link to destination
   createScriptNode() {
     if (this.params.audioScriptProcessor) {
       this.scriptNode = this.params.audioScriptProcessor;
@@ -188,20 +191,34 @@ export default class WebAudio extends utils.Observer {
       this.scriptNode.onaudioprocess = () => {};
   }
 
+  //for play and volume controle 
+  createVolumeNode() {
+    // Create gain node using the AudioContext
+    if (this.ac.createGain) {
+      this.gainNode = this.ac.createGain();
+    } else {
+      this.gainNode = this.ac.createGainNode();
+    }
+    // Add the gain node to the graph
+    this.gainNode.connect(this.ac.destination);
+  }
+
+  //for play and show
   createAnalyserNode() {
-    this.analyser = this.offlineAc.createAnalyser();
+    this.analyser = this.ac.createAnalyser();
     this.analyser.connect(this.gainNode);
   }
 
-  createVolumeNode() {
-    // Create gain node using the AudioContext
+
+  //for offline process gain and audio buffer gain preprocess
+  createGainProcessNode() {
     if (this.offlineAc.createGain) {
-      this.gainNode = this.offlineAc.createGain();
+      this.gainProcessNode = this.offlineAc.createGain();
     } else {
-      this.gainNode = this.offlineAc.createGainNode();
+      this.gainProcessNode = this.offlineAc.createGainNode();
     }
     // Add the gain node to the graph
-    this.gainNode.connect(this.offlineAc.destination);
+    this.gainProcessNode.connect(this.offlineAc.destination);
   }
 
   setSinkId(deviceId) {
@@ -273,7 +290,7 @@ export default class WebAudio extends utils.Observer {
     this.mergedPeaks = [];
     // Set the last element of the sparse array so the peak arrays are
     // appropriately sized for other calculations.
-    const channels = this.buffer ? this.buffer.numberOfChannels : 1;
+    const channels = this.renderBuffer ? this.buffer.numberOfChannels : 1;
     let c;
     for (c = 0; c < channels; c++) {
       this.splitPeaks[c] = [];
@@ -288,7 +305,7 @@ export default class WebAudio extends utils.Observer {
     if (this.peaks) {
       return this.peaks;
     }
-    if (!this.buffer) {
+    if (!this.renderBuffer) {
       return [];
     }
 
@@ -297,25 +314,25 @@ export default class WebAudio extends utils.Observer {
 
     this.setLength(length);
 
-    if (!this.buffer) {
+    if (!this.renderBuffer) {
       return this.params.splitChannels
         ? this.splitPeaks
         : this.mergedPeaks;
     }
 
-    if (!this.buffer.length) {
+    if (!this.renderBuffer.length) {
       const newBuffer = this.createBuffer(1, 4096, this.sampleRate);
-      this.buffer = newBuffer.buffer;
+      this.renderBuffer = newBuffer.renderBuffer;
     }
 
-    const sampleSize = this.buffer.length / length;
+    const sampleSize = this.renderBuffer.length / length;
     const sampleStep = ~~(sampleSize / 10) || 1;
-    const channels = this.buffer.numberOfChannels;
+    const channels = this.renderBuffer.numberOfChannels;
     let c;
 
     for (c = 0; c < channels; c++) {
       const peaks = this.splitPeaks[c];
-      const chan = this.buffer.getChannelData(c);
+      const chan = this.renderBuffer.getChannelData(c);
       let i;
 
       for (i = first; i <= last; i++) {
@@ -363,17 +380,28 @@ export default class WebAudio extends utils.Observer {
     }
   }
 
+  disconnectOfflineSource() {
+    if (this.offlineSource) {
+      this.offlineSource.disconnect();
+    }
+  }
+
   destroy() {
     if (!this.isPaused()) {
       this.pause();
     }
     this.unAll();
     this.buffer = null;
+    this.renderBuffer = null;
+
     this.disconnectFilters();
     this.disconnectSource();
-    this.gainNode.disconnect();
     this.scriptNode.disconnect();
+    this.gainNode.disconnect();
     this.analyser.disconnect();
+
+    this.disconnectOfflineSource();
+    this.gainProcessNode.disconnect();
 
     // close the audioContext if closeAudioContext option is set to true
     if (this.params.closeAudioContext) {
@@ -402,7 +430,7 @@ export default class WebAudio extends utils.Observer {
     this.startPosition = 0;
     this.lastPlay = this.ac.currentTime;
     this.buffer = buffer;
-    return this.createSource();
+    return this.startRenderBuffer();
   }
 
   exportRenderBuffer() {
@@ -425,66 +453,32 @@ export default class WebAudio extends utils.Observer {
     })
   }
 
-  createSource() {
-    this.disconnectSource();
-
-
-    console.log("999999999999: ", this.buffer);
+  startRenderBuffer() {
+    this.disconnectOfflineSource();
 
     //create offline audio context graph, gain node, scripte node, analyser node
-    this.offlineAc = new window.OfflineAudioContext(this.buffer.numberOfChannels, this.buffer.sampleRate*(parseInt(this.buffer.duration)+1), this.buffer.sampleRate);
+    this.offlineAc = new window.OfflineAudioContext(this.buffer.numberOfChannels, 
+                                                    this.buffer.sampleRate*(parseInt(this.buffer.duration)+1), 
+                                                    this.buffer.sampleRate);
 
-    this.createVolumeNode();
-    this.createScriptNode();
-    this.createAnalyserNode();
+    this.createGainProcessNode();
 
-    //crate offline source
+    //crate offline source and connect to the gain process node
     this.offlineSource = this.offlineAc.createBufferSource();
     this.offlineSource.buffer = this.buffer;
+    this.offlineSource.connect(this.gainProcessNode);
 
-    //this.offlineGainNode = this.offlineAc.createGain();
-
-    //this.offlineSource.connect(this.offlineGainNode);
-    //this.offlineGainNode.connect(this.offlineAc.destination);
-
+    this.gainProcessNode.gain.setValueAtTime(0.3, this.offlineAc.currentTime);
     this.offlineSource.start();
 
-    let self = this
+    let self = this;
 
     return this.offlineAc.startRendering()
     .then(function(renderBuffer) {
-      //console.log("-----> buffer render: ", renderBuffer);
-      //console.log("data raw-->", self.offlineSource.buffer.getChannelData(0));
-      //console.log("data render-->", renderBuffer.getChannelData(0));
-
-      self.source = self.ac.createBufferSource();
-
-      self.source.start = self.source.start || self.source.noteGrainOn;
-      self.source.stop = self.source.stop || self.source.noteOff;
-
-      self.source.playbackRate.setValueAtTime(
-        self.playbackRate,
-        self.ac.currentTime
-      );
-      self.source.buffer = self.buffer;
-      self.source.connect(self.ac.destination);
-      //self.source.connect(self.analyser);
-
+      self.renderBuffer = renderBuffer;
+      self.createPlaySource();
       return renderBuffer;
-    })
-
-
-    //this.source = this.ac.createBufferSource();
-
-    //this.source.start = this.source.start || this.source.noteGrainOn;
-    //this.source.stop = this.source.stop || this.source.noteOff;
-
-    //this.source.playbackRate.setValueAtTime(
-      //this.playbackRate,
-      //this.ac.currentTime
-    //);
-    //this.source.buffer = this.buffer;
-    //this.source.connect(this.analyser);
+    });
 
   }
 
@@ -500,9 +494,9 @@ export default class WebAudio extends utils.Observer {
       this.playbackRate,
       this.ac.currentTime
     );
-    this.source.buffer = this.buffer;
-    this.source.connect(this.ac.destination);
-
+    this.source.buffer = this.renderBuffer;
+    //this.source.connect(this.ac.destination);
+    this.source.connect(this.analyser);
   }
 
   isPaused() {
@@ -513,14 +507,14 @@ export default class WebAudio extends utils.Observer {
     if (this.explicitDuration) {
       return this.explicitDuration;
     }
-    if (!this.buffer) {
+    if (!this.renderBuffer) {
       return 0;
     }
-    return this.buffer.duration;
+    return this.renderBuffer.duration;
   }
 
   seekTo(start, end) {
-    if (!this.buffer) {
+    if (!this.renderBuffer) {
       return;
     }
 
@@ -554,14 +548,13 @@ export default class WebAudio extends utils.Observer {
   }
 
   play(start, end) {
-    if (!this.buffer) {
+    if (!this.renderBuffer) {
       return;
     }
 
-    console.log("888888888888: ", this.buffer);
+    console.log("888888888888: ", this.renderBuffer);
 
     // need to re-create source on each playback
-    //this.createSource();
     this.createPlaySource();
 
     const adjustedTime = this.seekTo(start, end);
