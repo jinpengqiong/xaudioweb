@@ -703,6 +703,17 @@ export default class WaveForm extends utils.Observer {
     this.backend.exportRenderBuffer()
   }
 
+  cutDelete() {
+    //this.backend.cutDelete()
+    this.backend.cutDelete(2, 30)
+    .then(renderBuffer => {
+      this.drawBuffer();
+      this.fireEvent('ready');
+      this.isReady = true;
+    });
+
+  }
+
   cancelAjax() {
     if (this.currentRequest && this.currentRequest.controller) {
       this.currentRequest.controller.abort();

@@ -72,6 +72,11 @@ const exportRenderBuffer = () => {
   wavesurfer.exportRenderBuffer();
 }
 
+const cutDelete = () => {
+  wavesurfer.cutDelete();
+}
+
+
 
 const tt5 = () => {
   const aa = new CommonWrapper({
@@ -255,6 +260,12 @@ class EditPage extends React.Component {
                   <Button onClick={exportRenderBuffer}>
                     export
                   </Button>
+                  <Button onClick={cutDelete}>
+                    cut 
+                  </Button>
+
+
+
 
                 </Row>
               </WrapperRelative>

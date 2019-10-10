@@ -441,6 +441,35 @@ export default class WebAudio extends utils.Observer {
     downFile(wav, "hehe.wav");
   }
 
+  cutDelete(startTime, endTime) {
+    let deltaT = 1. / this.renderBuffer.sampleRate;
+
+    let startOffset = startTime / deltaT;
+    let endOffset = endTime / deltaT;
+
+    let frameCount = this.renderBuffer.length - (endOffset - startOffset); 
+
+    let newRenderBuffer = this.offlineAc.createBuffer(this.renderBuffer.numberOfChannels, 
+                                                      frameCount, this.renderBuffer.sampleRate);
+    for (let i = 0; i < this.renderBuffer.numberOfChannels; i++) {
+
+      let oldRenderBufferData = this.renderBuffer.getChannelData(i);
+      let newRenderBufferData = newRenderBuffer.getChannelData(i);
+      for (let j = 0; j < startOffset; j++) {
+        newRenderBufferData[j] = oldRenderBufferData[j]; 
+      }
+
+      for (let j = endOffset, k = 0; j < this.renderBuffer.length; j++, k++) {
+        newRenderBufferData[startOffset+k] = oldRenderBufferData[j]; 
+      }
+    }
+
+    this.buffer = newRenderBuffer;
+
+    return this.startRenderBuffer();
+  }
+
+
   startRenderBuffer() {
     this.disconnectOfflineSource();
 
