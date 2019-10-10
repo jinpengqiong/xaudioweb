@@ -701,12 +701,6 @@ export default class WaveForm extends utils.Observer {
   exportRenderBuffer() {
     console.log("11111111111: ", this.backend);
     this.backend.exportRenderBuffer()
-    .then(function(buffer) {
-      console.log("wavesurfer render buffer: ", buffer);
-    })
-    .catch(e => {
-      console.log("------------", e);
-    })
   }
 
   cancelAjax() {

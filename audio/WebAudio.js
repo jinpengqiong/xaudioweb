@@ -1,4 +1,6 @@
 import * as utils from '../utils';
+import { downFile } from '../utils/common';
+import audioBufferToWav from './tools/audiobuffer2wav';
 
 const PLAYING = 'playing';
 const PAUSED = 'paused';
@@ -434,23 +436,9 @@ export default class WebAudio extends utils.Observer {
   }
 
   exportRenderBuffer() {
-    console.log("2222222222", this.offlineSource.buffer);
-
-    this.offlineGainNode.gain.setValueAtTime(3, this.offlineAc.currentTime);
-
-    this.offlineSource.start();
-    console.log("333333333", this.offlineSource.buffer);
-    var self = this
-
-
-    return this.offlineAc.startRendering()
-    .then(function(renderBuffer) {
-      console.log("-----> buffer render: ", renderBuffer);
-      console.log("data raw-->", self.offlineSource.buffer.getChannelData(0));
-      console.log("data render-->", renderBuffer.getChannelData(0));
-
-      return renderBuffer;
-    })
+    console.log("11111111111111", this.renderBuffer);
+    let wav = audioBufferToWav(this.renderBuffer);
+    downFile(wav, "hehe.wav");
   }
 
   startRenderBuffer() {
@@ -468,7 +456,9 @@ export default class WebAudio extends utils.Observer {
     this.offlineSource.buffer = this.buffer;
     this.offlineSource.connect(this.gainProcessNode);
 
-    this.gainProcessNode.gain.setValueAtTime(0.3, this.offlineAc.currentTime);
+    //this.gainProcessNode.gain.setValueAtTime(0.3, this.offlineAc.currentTime);
+    this.gainProcessNode.gain.setValueAtTime(3, 30);
+    this.gainProcessNode.gain.setValueAtTime(1, 36);
     this.offlineSource.start();
 
     let self = this;
