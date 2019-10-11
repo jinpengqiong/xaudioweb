@@ -498,6 +498,8 @@ export default class WebAudio extends utils.Observer {
     } 
   }
 
+
+
   recoverDeleteRange(startOffset, endOffset, delBuffer) {
     let frameCount = this.renderBuffer.length + (endOffset - startOffset); 
 
