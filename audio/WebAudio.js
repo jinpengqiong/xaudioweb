@@ -447,8 +447,11 @@ export default class WebAudio extends utils.Observer {
     let deltaT = 1. / this.renderBuffer.sampleRate;
 
     //startOffset and endOffset is the cut range
-    let startOffset = startTime / deltaT;
-    let endOffset = endTime / deltaT;
+    let startOffset = parseInt(startTime / deltaT);
+    let endOffset = parseInt(endTime / deltaT);
+
+    console.log("@@@1: ", startOffset);
+    console.log("@@@2", endOffset);
 
     let frameCount = this.renderBuffer.length - (endOffset - startOffset); 
 
@@ -493,9 +496,11 @@ export default class WebAudio extends utils.Observer {
   recoverAction() {
     let action = this.editActions.pop();
 
-    if (action.cmd == "cutDelete") {
-      return this.recoverDeleteRange(action.data.start, action.data.end, action.data.buffer);
-    } 
+    if (action) {
+      if (action.cmd == "cutDelete") {
+        return this.recoverDeleteRange(action.data.start, action.data.end, action.data.buffer);
+      } 
+    }
   }
 
 
@@ -632,8 +637,6 @@ export default class WebAudio extends utils.Observer {
     if (!this.renderBuffer) {
       return;
     }
-
-    console.log("888888888888: ", this.renderBuffer);
 
     // need to re-create source on each playback
     this.createPlaySource();

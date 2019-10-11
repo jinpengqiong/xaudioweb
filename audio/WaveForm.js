@@ -147,6 +147,7 @@ export default class WaveForm extends utils.Observer {
     this.createDrawer();
     this.createBackend();
     this.createPeakCache();
+
     return this;
   }
 
@@ -704,9 +705,10 @@ export default class WaveForm extends utils.Observer {
   }
 
   cutDelete() {
-    //this.backend.cutDelete()
-    //this.backend.cutDelete(2, 30)
-    this.backend.cutDelete(30, 40)
+    let start = this.section.getStartTime();
+    let end = this.section.getEndTime();
+
+    this.backend.cutDelete(start, end)
     .then(renderBuffer => {
       this.drawBuffer();
       this.fireEvent('ready');

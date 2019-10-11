@@ -859,6 +859,38 @@ export default class SectionPlugin {
         //return min;
     //}
 
+    getStartTime() {
+      //let duration = this.wavesurfer.getDuration();
+
+      //console.log("########!!!!!!!!!!!: ", duration);
+      //console.log("########!!!!!!!!!!!0000000000: ", this.section.start);
+      //let startTime = this.wavesurfer.section.util.getRegionSnapToGridValue(
+        //this.section.start * duration
+      //);
+
+      //return startTime;
+
+      if (this.section) 
+        return this.section.start;
+      else 
+        return 0;
+    }
+
+    getEndTime() {
+      //let duration = this.wavesurfer.getDuration();
+
+      //const endTime = this.wavesurfer.section.util.getRegionSnapToGridValue(
+        //this.section.end * duration
+      //);
+
+      //return endTime;
+
+      if (this.section)
+        return this.section.end;
+      else 
+        return 0;
+    }
+
     /**
      * Match the value to the grid, if required
      *
