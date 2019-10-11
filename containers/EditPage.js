@@ -76,6 +76,10 @@ const cutDelete = () => {
   wavesurfer.cutDelete();
 }
 
+const recoverAction = () => {
+  wavesurfer.recoverAction();
+}
+
 
 
 const tt5 = () => {
@@ -262,6 +266,9 @@ class EditPage extends React.Component {
                   </Button>
                   <Button onClick={cutDelete}>
                     cut 
+                  </Button>
+                  <Button onClick={recoverAction}>
+                    recover 
                   </Button>
 
 

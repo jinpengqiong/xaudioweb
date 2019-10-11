@@ -87,6 +87,7 @@ export default class WebAudio extends utils.Observer {
     this.analyser = null;
     this.buffer = null;
     this.renderBuffer = null;
+    this.editActions = [];
     this.filters = [];
     this.gainNode = null;
     this.gainProcessNode = null;
@@ -395,6 +396,7 @@ export default class WebAudio extends utils.Observer {
     this.unAll();
     this.buffer = null;
     this.renderBuffer = null;
+    this.editActions = [];
 
     this.disconnectFilters();
     this.disconnectSource();
@@ -432,7 +434,7 @@ export default class WebAudio extends utils.Observer {
     this.startPosition = 0;
     this.lastPlay = this.ac.currentTime;
     this.buffer = buffer;
-    return this.startRenderBuffer();
+    return this.startRenderBuffer(buffer);
   }
 
   exportRenderBuffer() {
@@ -444,6 +446,7 @@ export default class WebAudio extends utils.Observer {
   cutDelete(startTime, endTime) {
     let deltaT = 1. / this.renderBuffer.sampleRate;
 
+    //startOffset and endOffset is the cut range
     let startOffset = startTime / deltaT;
     let endOffset = endTime / deltaT;
 
@@ -451,43 +454,100 @@ export default class WebAudio extends utils.Observer {
 
     let newRenderBuffer = this.offlineAc.createBuffer(this.renderBuffer.numberOfChannels, 
                                                       frameCount, this.renderBuffer.sampleRate);
+    let delBuffer = this.offlineAc.createBuffer(this.renderBuffer.numberOfChannels,
+                                                endOffset - startOffset, this.renderBuffer.sampleRate);
     for (let i = 0; i < this.renderBuffer.numberOfChannels; i++) {
 
       let oldRenderBufferData = this.renderBuffer.getChannelData(i);
       let newRenderBufferData = newRenderBuffer.getChannelData(i);
+      let delBufferData = delBuffer.getChannelData(i);
+
+      //[0, startTime) first splite range
       for (let j = 0; j < startOffset; j++) {
         newRenderBufferData[j] = oldRenderBufferData[j]; 
       }
 
+      //[startTime, endTime) delete range
+      for (let j = startOffset, k = 0; j < endOffset; j++, k++) {
+        delBufferData[k] = oldRenderBufferData[j];
+      }
+
+      //[endTime, length-1] second splite range
       for (let j = endOffset, k = 0; j < this.renderBuffer.length; j++, k++) {
         newRenderBufferData[startOffset+k] = oldRenderBufferData[j]; 
       }
     }
 
-    this.buffer = newRenderBuffer;
+    this.editActions.push({
+      cmd: "cutDelete",
+      data: {
+        start: startOffset,
+        end: endOffset,
+        buffer: delBuffer
+      }
+    })
 
-    return this.startRenderBuffer();
+    return this.startRenderBuffer(newRenderBuffer);
+  }
+
+  recoverAction() {
+    let action = this.editActions.pop();
+
+    if (action.cmd == "cutDelete") {
+      return this.recoverDeleteRange(action.data.start, action.data.end, action.data.buffer);
+    } 
+  }
+
+  recoverDeleteRange(startOffset, endOffset, delBuffer) {
+    let frameCount = this.renderBuffer.length + (endOffset - startOffset); 
+
+    let newRenderBuffer = this.offlineAc.createBuffer(this.renderBuffer.numberOfChannels, 
+                                                      frameCount, this.renderBuffer.sampleRate);
+
+    for (let i = 0; i < this.renderBuffer.numberOfChannels; i++) {
+
+      let oldRenderBufferData = this.renderBuffer.getChannelData(i);
+      let newRenderBufferData = newRenderBuffer.getChannelData(i);
+      let delBufferData = delBuffer.getChannelData(i);
+
+      //[0, startTime) first splite range
+      for (let j = 0; j < startOffset; j++) {
+        newRenderBufferData[j] = oldRenderBufferData[j]; 
+      }
+
+      //[startTime, endTime) delete range
+      for (let j = startOffset, k=0; j < endOffset; j++, k++) {
+        newRenderBufferData[j] = delBufferData[k];
+      }
+
+      //[endTime, frameCount-1] second splite range
+      for (let j = endOffset, k = 0; j < frameCount; j++, k++) {
+        newRenderBufferData[j] = oldRenderBufferData[startOffset+k]; 
+      }
+    }
+    
+    return this.startRenderBuffer(newRenderBuffer);
   }
 
 
-  startRenderBuffer() {
+  startRenderBuffer(buffer) {
     this.disconnectOfflineSource();
 
     //create offline audio context graph, gain node, scripte node, analyser node
-    this.offlineAc = new window.OfflineAudioContext(this.buffer.numberOfChannels, 
-                                                    this.buffer.sampleRate*(parseInt(this.buffer.duration)+1), 
-                                                    this.buffer.sampleRate);
+    this.offlineAc = new window.OfflineAudioContext(buffer.numberOfChannels, 
+                                                    buffer.sampleRate*(parseInt(buffer.duration)+1), 
+                                                    buffer.sampleRate);
 
     this.createGainProcessNode();
 
     //crate offline source and connect to the gain process node
     this.offlineSource = this.offlineAc.createBufferSource();
-    this.offlineSource.buffer = this.buffer;
+    this.offlineSource.buffer = buffer;
     this.offlineSource.connect(this.gainProcessNode);
 
     //this.gainProcessNode.gain.setValueAtTime(0.3, this.offlineAc.currentTime);
-    this.gainProcessNode.gain.setValueAtTime(3, 30);
-    this.gainProcessNode.gain.setValueAtTime(1, 36);
+    //this.gainProcessNode.gain.setValueAtTime(3, 30);
+    //this.gainProcessNode.gain.setValueAtTime(1, 36);
     this.offlineSource.start();
 
     let self = this;

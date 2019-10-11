@@ -705,13 +705,23 @@ export default class WaveForm extends utils.Observer {
 
   cutDelete() {
     //this.backend.cutDelete()
-    this.backend.cutDelete(2, 30)
+    //this.backend.cutDelete(2, 30)
+    this.backend.cutDelete(30, 40)
     .then(renderBuffer => {
       this.drawBuffer();
       this.fireEvent('ready');
       this.isReady = true;
     });
 
+  }
+
+  recoverAction() {
+    this.backend.recoverAction()
+    .then(renderBuffer => {
+      this.drawBuffer();
+      this.fireEvent('ready');
+      this.isReady = true;
+    });
   }
 
   cancelAjax() {
