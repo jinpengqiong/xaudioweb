@@ -484,8 +484,10 @@ export default class WebAudio extends utils.Observer {
     this.editActions.push({
       cmd: "cutDelete",
       data: {
-        start: startOffset,
-        end: endOffset,
+        start: startTime,
+        end: endTime,
+        startOffset: startOffset,
+        endOffset: endOffset,
         buffer: delBuffer
       }
     })
@@ -498,9 +500,20 @@ export default class WebAudio extends utils.Observer {
 
     if (action) {
       if (action.cmd == "cutDelete") {
-        return this.recoverDeleteRange(action.data.start, action.data.end, action.data.buffer);
+        return this.recoverDeleteRange(action.data.startOffset, action.data.endOffset, action.data.buffer)
+        .then(function(renderBuffer) {
+          return {
+            action: action, 
+            buffer: renderBuffer
+          };
+        });
       } 
     }
+
+    return Promise.resolve({
+      action: null,
+      buffer: null
+    });
   }
 
 

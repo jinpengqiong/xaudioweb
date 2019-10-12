@@ -720,7 +720,18 @@ export default class WaveForm extends utils.Observer {
 
   recoverAction() {
     this.backend.recoverAction()
-    .then(renderBuffer => {
+    .then(result => {
+      if (!result.action)
+        return;
+
+      if (result.action.cmd == "cutDelete") {
+        this.section.clear();
+        this.section.add({
+          start: result.action.data.start,
+          end: result.action.data.end,
+        });
+      }
+
       this.drawBuffer();
       //this.fireEvent('ready');
       //this.isReady = true;
