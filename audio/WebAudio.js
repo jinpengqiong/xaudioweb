@@ -450,8 +450,8 @@ export default class WebAudio extends utils.Observer {
     let startOffset = parseInt(startTime / deltaT);
     let endOffset = parseInt(endTime / deltaT);
 
-    console.log("@@@1: ", startOffset);
-    console.log("@@@2", endOffset);
+    //console.log("@@@1: ", startOffset);
+    //console.log("@@@2", endOffset);
 
     let frameCount = this.renderBuffer.length - (endOffset - startOffset); 
 

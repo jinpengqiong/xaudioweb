@@ -711,8 +711,9 @@ export default class WaveForm extends utils.Observer {
     this.backend.cutDelete(start, end)
     .then(renderBuffer => {
       this.drawBuffer();
-      this.fireEvent('ready');
-      this.isReady = true;
+      this.section.clear();
+      //this.fireEvent('ready');
+      //this.isReady = true;
     });
 
   }
@@ -721,8 +722,8 @@ export default class WaveForm extends utils.Observer {
     this.backend.recoverAction()
     .then(renderBuffer => {
       this.drawBuffer();
-      this.fireEvent('ready');
-      this.isReady = true;
+      //this.fireEvent('ready');
+      //this.isReady = true;
     });
   }
 
