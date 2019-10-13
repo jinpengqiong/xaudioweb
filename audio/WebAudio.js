@@ -555,7 +555,8 @@ export default class WebAudio extends utils.Observer {
 
     //create offline audio context graph, gain node, scripte node, analyser node
     this.offlineAc = new window.OfflineAudioContext(buffer.numberOfChannels, 
-                                                    buffer.sampleRate*(parseInt(buffer.duration)+1), 
+                                                    //buffer.sampleRate*(parseInt(buffer.duration)+1), 
+                                                    buffer.length,
                                                     buffer.sampleRate);
 
     this.createGainProcessNode();
