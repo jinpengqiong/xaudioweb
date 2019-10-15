@@ -94,8 +94,8 @@ const tt5 = () => {
     container: '#waveform',
     waveColor: '#48db95', //'cyan', //'blue',
     //waveColor: 'blue', //'cyan', //'blue',
-    //progressColor: 'grey',//'white',
-    progressColor: '#48db95',//'white',
+    progressColor: 'grey',//'white',
+    //progressColor: '#48db95',//'white',
     backgroundColor: 'black',
     splitChannels: true,
     height: 128,
@@ -106,6 +106,7 @@ const tt5 = () => {
         customShowTimeStyle: {
           'background-color': '#000',
           color: '#fff',
+          //color: 'blue',
           padding: '2px',
           'font-size': '10px'
         }

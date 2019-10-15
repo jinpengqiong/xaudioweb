@@ -185,7 +185,12 @@ class Section {
                 left: left + 'px',
                 width: sectionWidth + 'px',
                 backgroundColor: this.color,
-                cursor: this.drag ? 'move' : 'default'
+                cursor: this.drag ? 'move' : 'default',
+
+                borderLeftStyle: 'solid',
+                borderLeftWidth: '1px',
+                borderLeftColor: 'blue' 
+
             });
 
             for (const attrname in this.attributes) {
@@ -478,6 +483,7 @@ class Section {
         }
         console.log("now real start: ", this.start, ", real end: ", this.end);
     }
+
 }
 
 /**
@@ -652,6 +658,7 @@ export default class SectionPlugin {
             this.section = null;
         });
 
+
         return section;
     }
 
@@ -776,7 +783,6 @@ export default class SectionPlugin {
         });
 
         const eventMove = e => {
-                  console.log("###################2222222222222222222222222");
             if (!drag) {
                 return;
             }

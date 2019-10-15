@@ -71,7 +71,8 @@ export default class CursorPlugin {
     defaultParams = {
         hideOnBlur: true,
         width: '1px',
-        color: 'red', //'black',
+        //color: 'red', //'black',
+        color: 'grey', //'black',
         opacity: '0.25',
         style: 'solid',
         zIndex: 4,

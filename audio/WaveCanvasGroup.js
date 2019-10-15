@@ -47,7 +47,8 @@ export default class WaveCanvasGroup extends RectWrapper {
   updateCursor() {
     this.style(this.progressWave, {
       borderRightWidth: this.params.cursorWidth + 'px',
-      borderRightColor: this.params.cursorColor
+      //borderRightColor: this.params.cursorColor
+      borderRightColor: 'red' 
     });
   }
 
