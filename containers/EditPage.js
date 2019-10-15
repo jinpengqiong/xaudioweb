@@ -102,11 +102,11 @@ const tt5 = () => {
     height: 128,
     plugins: [
       AnchorPlugin.create({
-        showTime: false,
-        opacity: 1,
-        isFixed: true,
-        style: 'dotted',
-        color: 'yellow',
+        showTime: true,
+        opacity: 0.7,
+        //style: 'dotted',
+        style: 'dashed',
+        color: 'red',
         customShowTimeStyle: {
           'background-color': '#000',
           color: '#fff',
@@ -117,8 +117,9 @@ const tt5 = () => {
 
       CursorPlugin.create({
         showTime: true,
-        opacity: 1,
-        isFixed: false,
+        //opacity: 1,
+        opacity: 0.25,
+        color: 'blue',
         customShowTimeStyle: {
           'background-color': '#000',
           color: '#fff',
@@ -126,9 +127,6 @@ const tt5 = () => {
           'font-size': '10px'
         }
       }),
-
-
-
 
 
       TimelinePlugin.create({
