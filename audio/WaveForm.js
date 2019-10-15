@@ -155,6 +155,7 @@ export default class WaveForm extends utils.Observer {
     plugins.forEach(plugin => this.addPlugin(plugin));
 
     plugins.forEach(plugin => {
+      console.log("===========> ", plugin.name, '   ', plugin.deferInit);
       if (!plugin.deferInit) {
         this.initPlugin(plugin.name);
       }
@@ -379,7 +380,9 @@ export default class WaveForm extends utils.Observer {
       this.backend.play();
     }
     this.params.scrollParent = oldScrollParent;
+
     this.fireEvent('seek', progress);
+    console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuu");
   }
 
   stop() {

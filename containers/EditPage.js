@@ -15,6 +15,7 @@ import langmap from '../config/langmap';
 
 import CanvasWave from '../components/CanvasWave';
 import WaveForm from '../audio/WaveForm';
+import AnchorPlugin from '../audio/plugin/anchor';
 import CursorPlugin from '../audio/plugin/cursor';
 import TimelinePlugin from '../audio/plugin/timeline';
 import RegionsPlugin from '../audio/plugin/regions';
@@ -100,17 +101,35 @@ const tt5 = () => {
     splitChannels: true,
     height: 128,
     plugins: [
-      CursorPlugin.create({
-        showTime: true,
+      AnchorPlugin.create({
+        showTime: false,
         opacity: 1,
+        isFixed: true,
+        style: 'dotted',
+        color: 'yellow',
         customShowTimeStyle: {
           'background-color': '#000',
           color: '#fff',
-          //color: 'blue',
           padding: '2px',
           'font-size': '10px'
         }
       }),
+
+      CursorPlugin.create({
+        showTime: true,
+        opacity: 1,
+        isFixed: false,
+        customShowTimeStyle: {
+          'background-color': '#000',
+          color: '#fff',
+          padding: '2px',
+          'font-size': '10px'
+        }
+      }),
+
+
+
+
 
       TimelinePlugin.create({
         container: "#wave-timeline"
