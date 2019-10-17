@@ -17,6 +17,8 @@ import CanvasWave from '../components/CanvasWave';
 import WaveForm from '../audio/WaveForm';
 import AnchorPlugin from '../audio/plugin/anchor';
 import CursorPlugin from '../audio/plugin/cursor';
+import FrequencyPlugin from '../audio/plugin/frequency';
+import VolmeterPlugin from '../audio/plugin/volmeter';
 import TimelinePlugin from '../audio/plugin/timeline';
 import RegionsPlugin from '../audio/plugin/regions';
 import SectionPlugin from '../audio/plugin/section';
@@ -145,6 +147,12 @@ const tt5 = () => {
         drag: false
       }),
 
+      FrequencyPlugin.create({
+        container: "#wave-frequency",
+        width: 1024,
+        height: 256 
+      }),
+
 
       //SpectrumPlugin.create({
         //wavesurfer: wavesurfer,
@@ -250,6 +258,7 @@ class EditPage extends React.Component {
                 <div id="hhh">
                   <div id="waveform"/>
                 </div>
+                <div id="wave-frequency"/>
                 <div id ="wave-spectrogram"/>
                 <Row>
                   <Col span={20} offset={0}>

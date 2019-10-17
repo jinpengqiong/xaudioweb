@@ -148,6 +148,7 @@ export default class WaveForm extends utils.Observer {
     this.createBackend();
     this.createPeakCache();
 
+
     return this;
   }
 
