@@ -148,6 +148,7 @@ export default class WaveForm extends utils.Observer {
     this.createBackend();
     this.createPeakCache();
 
+
     return this;
   }
 
@@ -287,6 +288,10 @@ export default class WaveForm extends utils.Observer {
     this.backend.on('audioprocess', time => {
       this.drawer.progress(this.backend.getPlayedPercents());
       this.fireEvent('audioprocess', time);
+    });
+
+    this.backend.on('audioprocessdata', e => {
+      this.fireEvent('audioprocessdata', e);
     });
   }
 

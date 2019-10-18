@@ -7,7 +7,7 @@ const PAUSED = 'paused';
 const FINISHED = 'finished';
 
 export default class WebAudio extends utils.Observer {
-  static scriptBufferSize = 256;
+  static scriptBufferSize = 1024; //256;
   audioContext = null;
   offlineAudioContext = null;
   stateBehaviors = {
@@ -104,9 +104,9 @@ export default class WebAudio extends utils.Observer {
   }
 
   init() {
-    this.createScriptNode();
     this.createVolumeNode();
     this.createAnalyserNode();
+    this.createScriptNode();
 
     this.setState(PAUSED);
     this.setPlaybackRate(this.params.audioRate);
@@ -172,10 +172,13 @@ export default class WebAudio extends utils.Observer {
       }
     }
     this.scriptNode.connect(this.ac.destination);
+    //this.scriptNode.connect(this.analyser);
   }
 
   addOnAudioProcess() {
-    this.scriptNode.onaudioprocess = () => {
+    this.scriptNode.onaudioprocess = (e) => {
+
+      //time fire
       const time = this.getCurrentTime();
 
       if (time >= this.getDuration()) {
@@ -185,7 +188,29 @@ export default class WebAudio extends utils.Observer {
         this.pause();
       } else if (this.state === this.states[PLAYING]) {
         this.fireEvent('audioprocess', time);
+        this.fireEvent('audioprocessdata', e);
       }
+
+      //copy data from input to output
+
+      //if (!this.isPaused()) {
+        //let inputBuffer = e.inputBuffer;
+        //let outputBuffer = e.outputBuffer;
+
+        ////method 1:
+        //for (let i = 0; i < inputBuffer.numberOfChannels; i++) {
+          //outputBuffer.copyToChannel(inputBuffer.getChannelData(i), i, 0);
+        //}
+      //} else {
+        //console.log("11111111111111");
+        //for (let i = 0; i < inputBuffer.numberOfChannels; i++) {
+          //let outputData = outputBuffer.getChannelData(i);
+          //for (let j = 0; j < inputBuffer.length; j++) {
+            //outputData[j] = 0;
+          //}
+        //}
+      //}
+
     };
   }
 
@@ -210,6 +235,11 @@ export default class WebAudio extends utils.Observer {
   createAnalyserNode() {
     this.analyser = this.ac.createAnalyser();
     this.analyser.connect(this.gainNode);
+
+    this.analyser.minDecibels = -90;
+    this.analyser.maxDecibels = 0;
+    console.log("-------min dB:", this.analyser.minDecibels);
+    console.log("-------max dB", this.analyser.maxDecibels);
   }
 
 
@@ -597,6 +627,7 @@ export default class WebAudio extends utils.Observer {
     this.source.buffer = this.renderBuffer;
     //this.source.connect(this.ac.destination);
     this.source.connect(this.analyser);
+    //this.source.connect(this.scriptNode);
   }
 
   isPaused() {

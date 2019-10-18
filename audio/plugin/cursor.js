@@ -56,6 +56,7 @@ export default class CursorPlugin {
      * @return {PluginDefinition} an object representing the plugin
      */
     static create(params) {
+        console.log('params',params);
         return {
             name: 'cursor',
             deferInit: params && params.deferInit ? params.deferInit : false,
