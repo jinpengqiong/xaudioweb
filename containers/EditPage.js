@@ -152,6 +152,12 @@ const tt5 = () => {
         width: 1024,
         height: 256 
       }),
+      VolmeterPlugin.create({
+        container: "#wave-volmeter",
+        width: 256,
+        height: 50 
+      }),
+
 
 
       //SpectrumPlugin.create({
@@ -259,6 +265,7 @@ class EditPage extends React.Component {
                   <div id="waveform"/>
                 </div>
                 <div id="wave-frequency"/>
+                <div id="wave-volmeter"/>
                 <div id ="wave-spectrogram"/>
                 <Row>
                   <Col span={20} offset={0}>

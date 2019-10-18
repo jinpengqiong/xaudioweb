@@ -289,6 +289,10 @@ export default class WaveForm extends utils.Observer {
       this.drawer.progress(this.backend.getPlayedPercents());
       this.fireEvent('audioprocess', time);
     });
+
+    this.backend.on('audioprocessdata', e => {
+      this.fireEvent('audioprocessdata', e);
+    });
   }
 
   createPeakCache() {

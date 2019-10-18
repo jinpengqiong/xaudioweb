@@ -175,7 +175,7 @@ export default class WebAudio extends utils.Observer {
   }
 
   addOnAudioProcess() {
-    this.scriptNode.onaudioprocess = () => {
+    this.scriptNode.onaudioprocess = (e) => {
       const time = this.getCurrentTime();
 
       if (time >= this.getDuration()) {
@@ -185,6 +185,7 @@ export default class WebAudio extends utils.Observer {
         this.pause();
       } else if (this.state === this.states[PLAYING]) {
         this.fireEvent('audioprocess', time);
+        this.fireEvent('audioprocessdata', e);
       }
     };
   }
@@ -210,6 +211,11 @@ export default class WebAudio extends utils.Observer {
   createAnalyserNode() {
     this.analyser = this.ac.createAnalyser();
     this.analyser.connect(this.gainNode);
+
+    this.analyser.minDecibels = -90;
+    this.analyser.maxDecibels = 0;
+    console.log("-------min dB:", this.analyser.minDecibels);
+    console.log("-------max dB", this.analyser.maxDecibels);
   }
 
 
