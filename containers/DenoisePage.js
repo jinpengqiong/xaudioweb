@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react';
 import theme from '../config/theme';
 import env from '../config/env';
 
-import {Layout, Row, Col, Radio, Input, Progress, 
+import {Layout, Row, Col, Radio, Input, Progress,
         Button, Upload, Icon, Slider, Switch, Alert,
         Form, Divider, Spin} from 'antd';
 import {ZeroWrapper, MainWrapper, WrapperRelative} from '../components/BaseStyle';
@@ -119,14 +119,14 @@ class DenoisePage extends React.Component {
                     <Col span={20}>
                       <Progress percent={denoise.progress} />
                       <br/>
-                      <Upload 
+                      <Upload
                        action=""
                        beforeUpload={denoise.openFile}
                        showUploadList={false}
                        >
                         <Col span={4}>
                           <Button disabled={denoise.isProcessing}>
-                            <Icon type="upload"/> {langmap.UploadProcess[lang]} 
+                            <Icon type="upload"/> {langmap.UploadProcess[lang]}
                           </Button>
                         </Col>
                         <Col span={2} offset={18}>
