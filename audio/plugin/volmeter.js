@@ -65,7 +65,32 @@ export default class VolmeterPlugin {
         return average;
       }
 
+      function getVu() {
+        //console.log("2222222222222222222: ", e);
+        //console.log("22222222222222222223333333: ", e.inputBuffer.getChannelData(0));
+        //let inputBuffer = e.inputBuffer;
+        //let inputData = inputBuffer.getChannelData(0);
 
+        let inputData = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(inputData);
+
+        let vuMax = 0, vu = 0;
+
+        console.log("888888888888: ",inputData);
+
+        for (let j = 0; j < analyser.fftSize; j++) {
+          vu = Math.abs(inputData[j]*32768);
+          if (vu > vuMax)
+            vuMax = vu;
+        }
+
+        let db = 20*Math.log10(vuMax/32768)+90;
+
+        let vuReal = parseInt(255*(Math.abs(db)/90)); 
+
+        console.log("#####################: vuReal", vuReal, "  vuMax: ", vuMax, " vu dB:" , 20*Math.log10(vuMax/32768));
+        return vuReal;
+      }
 
 
       function updateMeterCanvas() {
@@ -92,13 +117,17 @@ export default class VolmeterPlugin {
 
         let vvv;
         vvv = doaverage(dataArray);
-        console.log("1111111111111", vvv);
+        //console.log("1111111111111", vvv);
 
         vuAvg = parseInt(vuAvg/bufferLength);
+        let dbVu = vuMax*90/255-90; 
+
+        //console.log("----------------freq vu dB:", dbVu);
         //ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
         ctx.fillStyle = 'black'
         //ctx.fillRect(0, 0, Math.max(vu, vuAvg), height);
-        ctx.fillRect(Math.max(vuMax, vuAvg), 0, width, height);
+        //ctx.fillRect(Math.max(vuMax, vuAvg), 0, width, height);
+        ctx.fillRect(getVu(), 0, width, height);
         //ctx.fillRect(Math.max(vu, vvv), 0, width, height);
         //ctx.fillRect(vuMax, 0, width, height);
         //ctx.fillRect(vvv, 0, width, height);
