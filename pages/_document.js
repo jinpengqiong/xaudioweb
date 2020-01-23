@@ -15,16 +15,16 @@ export default class MyDocument extends Document {
     const sheet = new ServerStyleSheet()
     const main = sheet.collectStyles(<Main />)
     const styleTags = sheet.getStyleElement()
-    let _hmt = _hmt || [];
+    //let _hmt = _hmt || [];
 
     return (
       <html>
         <Head>
           <title>剪音网</title>
           <link rel="shortcut icon" href="/static/favicon.ico" />
-          <link rel="bookmark" href="/static/favicon.ico" type="image/x-icon"　/> 
+          <link rel="bookmark" href="/static/favicon.ico" type="image/x-icon"　/>
           <script src="https://unpkg.com/wavesurfer.js"></script>
-
+          <script src="https://d3js.org/d3.v5.min.js"></script>
           {baidujs()}
 
           {styleTags}

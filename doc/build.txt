@@ -1,2 +1,8 @@
 * ant-design的安装需要配置.babelrc
 * style-components需要安装babel-plugin-styled-components的插件，并且配置.babelrc
+
+//question
+*icon定制化如何最好，图片还是svg?
+*本地化保存工程，用localstorage? 本地重复打开能复现之前的工程状态，本地化保存还有就是云端同步
+*定制table list可以直接通过样式修改来解决，还是要自己完全写组件？
+*大文件打开和编辑，半个小时就可以是280M的文件，加载慢，最大能支持多大？

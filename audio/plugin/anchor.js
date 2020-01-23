@@ -1,61 +1,54 @@
-export default class CursorPlugin {
+export default class AnchorPlugin {
   static create(params) {
-    console.log('params',params);
     return {
-      name: 'cursor',
+      name: 'anchor',
       deferInit: params && params.deferInit ? params.deferInit : false,
       params: params,
       staticProps: {},
-      instance: CursorPlugin
+      instance: AnchorPlugin
     };
   }
 
   defaultParams = {
     hideOnBlur: true,
     width: '1px',
-    //color: 'red', //'black',
-    color: 'grey', //'black',
+    color: 'red', //'black',
     opacity: '0.25',
     style: 'solid',
     zIndex: 4,
     customStyle: {},
     customShowTimeStyle: {},
     showTime: false,
-    followCursorY: false,
+    followAnchorY: false,
     formatTimeCallback: null
   };
 
-  _onMousemove = e => {
+  _drawFixedCusor = (e) => {
     const bbox = this.waveform.container.getBoundingClientRect();
     let y = 0;
-    let x = e.clientX - bbox.left;
+    let x = bbox.right - bbox.left;
 
-    if (this.params.showTime && this.params.followCursorY) {
-      // follow y-position of the mouse
-      y = e.clientY - (bbox.top + bbox.height / 2);
-    }
-
-    this.updateCursorPosition(x, y);
+    let progress = this.waveform.drawer.handleEvent(e, true);
+    this.updateAnchorPosition(parseInt(x*progress)-1, y);
+    this.showAnchor();
   };
 
-  _onMouseenter = () => this.showCursor();
-
-  _onMouseleave = () => this.hideCursor();
 
   constructor(params, wf) {
     this.waveform = wf;
     this.style = wf.util.style;
-    this.cursor = null;
+    this.anchor = null;
     this.showTime = null;
     this.displayTime = null;
+
     this.params = wf.util.extend({}, this.defaultParams, params);
   }
 
   init() {
     this.wrapper = this.waveform.container;
-    this.cursor = this.wrapper.appendChild(
+    this.anchor = this.wrapper.appendChild(
       this.style(
-        document.createElement('cursor'),
+        document.createElement('anchor'),
         this.waveform.util.extend(
           {
           position: 'absolute',
@@ -111,29 +104,22 @@ export default class CursorPlugin {
       );
     }
 
-    this.wrapper.addEventListener('mousemove', this._onMousemove);
     if (this.params.hideOnBlur) {
-      // ensure elements are hidden initially
-      this.hideCursor();
-      this.wrapper.addEventListener('mouseenter', this._onMouseenter);
-      this.wrapper.addEventListener('mouseleave', this._onMouseleave);
+      this.hideAnchor();
     }
+
+    this.wrapper.addEventListener("mousedown", this._drawFixedCusor);
   }
 
   destroy() {
     if (this.params.showTime) {
-      this.cursor.parentNode.removeChild(this.showTime);
+      this.anchor.parentNode.removeChild(this.showTime);
     }
-    this.cursor.parentNode.removeChild(this.cursor);
-    this.wrapper.removeEventListener('mousemove', this._onMousemove);
-    if (this.params.hideOnBlur) {
-      this.wrapper.removeEventListener('mouseenter', this._onMouseenter);
-      this.wrapper.removeEventListener('mouseleave', this._onMouseleave);
-    }
+    this.anchor.parentNode.removeChild(this.anchor);
   }
 
-  updateCursorPosition(xpos, ypos) {
-    this.style(this.cursor, {
+  updateAnchorPosition(xpos, ypos) {
+    this.style(this.anchor, {
       left: `${xpos}px`
     });
     if (this.params.showTime) {
@@ -157,8 +143,8 @@ export default class CursorPlugin {
     }
   }
 
-  showCursor() {
-    this.style(this.cursor, {
+  showAnchor() {
+    this.style(this.anchor, {
       display: 'flex'
     });
     if (this.params.showTime) {
@@ -168,8 +154,8 @@ export default class CursorPlugin {
     }
   }
 
-  hideCursor() {
-    this.style(this.cursor, {
+  hideAnchor() {
+    this.style(this.anchor, {
       display: 'none'
     });
     if (this.params.showTime) {
@@ -179,14 +165,14 @@ export default class CursorPlugin {
     }
   }
 
-  formatTime(cursorTime) {
-    cursorTime = isNaN(cursorTime) ? 0 : cursorTime;
-    //console.log("111111111111111111111111:", cursorTime, "##222:", typeof(cursorTime));
+  formatTime(anchorTime) {
+    anchorTime = isNaN(anchorTime) ? 0 : anchorTime;
+    //console.log("111111111111111111111111:", anchorTime, "##222:", typeof(anchorTime));
 
     if (this.params.formatTimeCallback) {
-      return this.params.formatTimeCallback(cursorTime);
+      return this.params.formatTimeCallback(anchorTime);
     }
-    return [cursorTime].map(time =>
+    return [anchorTime].map(time =>
                             [
                               Math.floor((time % 3600) / 60), // minutes
                               ('00' + Math.floor(time % 60)).slice(-2), // seconds

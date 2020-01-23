@@ -6,7 +6,7 @@ export default class RectWrapper extends utils.Observer {
     this.container = container;
     this.params = params;
     this.width = 0;
-    this.height = params.height * this.params.pixelRatio;
+    this.height = (params.height) * this.params.pixelRatio;
     this.lastPos = 0;
     this.wrapper = null;
   }
@@ -129,6 +129,27 @@ export default class RectWrapper extends utils.Observer {
     }
   }
 
+
+  rebeginOnPosition(position, immediate) {
+    const scrollLeft = this.wrapper.scrollLeft;
+    const maxScroll = this.wrapper.scrollWidth - this.wrapper.clientWidth;
+    let target = position;
+    let offset = target - scrollLeft;
+
+    if (maxScroll == 0) {
+      // no need to continue if scrollbar is not there
+      return;
+    }
+
+   // limit target to valid range (0 to maxScroll)
+    target = Math.max(0, Math.min(maxScroll, target));
+    // no use attempting to scroll if we're not moving
+    if (target != scrollLeft) {
+      this.wrapper.scrollLeft = target;
+    }
+  }
+
+
   getScrollX() {
     let x = 0;
     if (this.wrapper) {
@@ -190,6 +211,7 @@ export default class RectWrapper extends utils.Observer {
     return true;
   }
 
+/*
   progress(progress) {
     const minPxDelta = 1 / this.params.pixelRatio;
     const pos = Math.round(progress * this.width) * minPxDelta;
@@ -205,6 +227,19 @@ export default class RectWrapper extends utils.Observer {
       this.updateProgress(pos);
     }
   }
+*/
+
+  progress(progress) {
+    const minPxDelta = 1 / this.params.pixelRatio;
+    const pos = Math.round(progress * this.width) * minPxDelta;
+
+    if (pos < this.lastPos || pos - this.lastPos >= minPxDelta) {
+      this.lastPos = pos;
+
+      this.updateProgress(pos);
+    }
+  }
+
 
   destroy() {
     this.unAll();

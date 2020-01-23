@@ -107,15 +107,15 @@ class CanvasWave extends EventEmitter {
     let ac = this.backend.ac;
 
     ac.decodeAudioData(rawData, (buffer) => {
-      console.log("33333344444444444444444444444", buffer);
-      console.log("44444444444444444444444", buffer.duration);
+      //console.log("33333344444444444444444444444", buffer);
+      //console.log("44444444444444444444444", buffer.duration);
       //create buffer source node and frequency analyser
       let audioBufferSourceNode = ac.createBufferSource();
 
       let analyser = ac.createAnalyser();
       analyser.fftSize = 256;
 
-      console.log("yyyyyyyyyy1111111111111111111111111", buffer.length)
+      //console.log("yyyyyyyyyy1111111111111111111111111", buffer.length)
       //destination is the play sound card
       audioBufferSourceNode.connect(analyser);
       analyser.connect(ac.destination);
@@ -160,7 +160,7 @@ class CanvasWave extends EventEmitter {
 
       function aaa() {
         audioBufferSourceNode.start(0, 200, 5);
-        console.log("111111111111111--------> curTime: ", ac.currentTime);
+        //console.log("111111111111111--------> curTime: ", ac.currentTime);
         drawFrequency();
       }
 

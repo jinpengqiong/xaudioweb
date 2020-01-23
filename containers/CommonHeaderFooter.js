@@ -5,10 +5,11 @@ const {Row, Col, Header, Footer} = Layout;
 import {Margin} from '../components/BaseStyle';
 import langmap from '../config/langmap';
 
+    //<Header style={{ background: '#001528', padding: 0, position: "fixed", zIndex: 1, width: '100%' }} >
 
 function CommonHeader() {
   return (
-    <Header style={{ background: '#001528', padding: 0, position: "fixed", zIndex: 1, width: '100%' }} >
+    <Header style={{ background: 'rgb(18,18,18)', padding: 0, position: "fixed", zIndex: 1, width: '100%' }} >
       <Margin left='18px'>
         <font color="white" size="4">
         XAudioPro

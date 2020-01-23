@@ -6,8 +6,25 @@ class CommonWrapper {
     console.log("kkkkkkjjjjjjjjjjjjjjjjj: ", params);
     this.container = document.querySelector(params.id);
 
-    this.width = window.innerWidth * params.wRatio;
-    this.height = window.innerHeight * params.hRatio;
+    if (params.width) {
+      this.width = params.width;
+    } else {
+      if (params.wRatio) {
+        this.width = window.innerWidth * params.wRatio;
+      } else {
+        this.width = 1024;
+      }
+    }
+
+    if (params.height) {
+      this.height = params.height;
+    } else {
+      if (params.hRatio) {
+        this.height = window.innerHeight * params.hRatio;
+      } else {
+        this.height = 256;
+      }
+    }
 
     console.log("jjjjjjjjjjjjjjjjj: ", this.container);
     console.log("width: ", window.innerWidth, this.width);

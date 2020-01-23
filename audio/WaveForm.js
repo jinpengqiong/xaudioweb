@@ -2,6 +2,7 @@ import * as utils from '../utils';
 import WebAudio from './WebAudio';
 import WaveCanvasGroup from './WaveCanvasGroup';
 import PeakCache from './PeakCache';
+import * as _ from 'lodash';
 
 
 class PluginClass {
@@ -13,6 +14,7 @@ class PluginClass {
 
 export default class WaveForm extends utils.Observer {
   defaultParams = {
+    enableResize: false,
     audioContext: null,
     audioScriptProcessor: null,
     audioRate: 1,
@@ -27,7 +29,7 @@ export default class WaveForm extends utils.Observer {
     duration: null,
     fillParent: true,
     forceDecode: false,
-    height: 128,
+    height: 256,
     hideScrollbar: false,
     interact: true,
     loopSelection: true,
@@ -55,16 +57,7 @@ export default class WaveForm extends utils.Observer {
 
   util = utils;
 
-    /**
-     * Functions in the `util` property are available as a static property of the
-     * WaveSurfer class
-     *
-     * @type {Object}
-     * @example
-     * WaveSurfer.util.style(myElement, { background: 'blue' });
-     */
   static util = utils;
-
 
 
   constructor(params) {
@@ -92,6 +85,7 @@ export default class WaveForm extends utils.Observer {
           utils.style(this.container, { transform: 'rotateY(180deg)' });
         }
 
+        //when set backgroud, set width also
         if (this.params.backgroundColor) {
           this.setBackgroundColor(this.params.backgroundColor);
         }
@@ -119,16 +113,39 @@ export default class WaveForm extends utils.Observer {
 
         this.isReady = false;
 
+        //resize params
+        this.resizeHeight = 7;
+
+
+        //db array
+        this.dbyArray = [];
+        this.timexArray = [];
+
+        //file info
+        this.fileName = "";
+        this.fileSize = 0;
+        this.fileDecodeSize = 0;
+        this.fileDuration = 0;
+        this.fileSampleRate = 0;
+        this.fileChannels = 0;
+        this.fileBitsPerSample = 0;
+
+        //rebegin time
+        this.rebeginTime = 0;
+        
         // responsive debounced event listener. If this.params.responsive is not
         // set, this is never called. Use 100ms or this.params.responsive as
         // timeout for the debounce function.
         let prevWidth = 0;
+
         this._onResize = utils.debounce(
           () => {
           if (
             prevWidth != this.drawer.wrapper.clientWidth &&
               !this.params.scrollParent
           ) {
+            this.resizeAll();
+
             prevWidth = this.drawer.wrapper.clientWidth;
             this.drawer.fireEvent('redraw');
           }
@@ -138,15 +155,32 @@ export default class WaveForm extends utils.Observer {
           : 100
         );
 
+        this._onResize2 = (() => {
+          this.resizeAll();
+        });
+
+
         return this;
   }
 
   init() {
     this.registerPlugins(this.params.plugins);
 
+
     this.createDrawer();
     this.createBackend();
     this.createPeakCache();
+
+    this.createResizeCross();
+    this.renderResizeCross();
+
+    //must resize container here, for should style this container with posistion
+    //then the resize bar can position ok
+    this.resizeContainer();
+
+    if (this.params.enableResize)
+      this.bindResizeEvents();
+
     return this;
   }
 
@@ -154,6 +188,7 @@ export default class WaveForm extends utils.Observer {
     plugins.forEach(plugin => this.addPlugin(plugin));
 
     plugins.forEach(plugin => {
+      //console.log("===========> ", plugin.name, '   ', plugin.deferInit);
       if (!plugin.deferInit) {
         this.initPlugin(plugin.name);
       }
@@ -248,7 +283,7 @@ export default class WaveForm extends utils.Observer {
     }
 
     this.drawer.on('redraw', () => {
-      this.drawBuffer();
+      this.drawBuffer(true);
       this.drawer.progress(this.backend.getPlayedPercents());
     });
 
@@ -260,11 +295,74 @@ export default class WaveForm extends utils.Observer {
     // Relay the scroll event from the drawer
     this.drawer.on('scroll', e => {
       if (this.params.partialRender) {
-        this.drawBuffer();
+        this.drawBuffer(true);
       }
       this.fireEvent('scroll', e);
     });
   }
+
+  getViewStartTime() {
+    let scrollLeft = this.drawer.getScrollX() / this.params.pixelRatio;
+
+    return (scrollLeft / this.drawer.wrapper.scrollWidth) * (this.backend.getDuration());
+  }
+
+  getViewEndTime() {
+    let scrollRight = (this.drawer.getScrollX() / this.params.pixelRatio) + this.drawer.wrapper.clientWidth;
+    let duration = this.backend.getDuration();
+
+    return Math.min(duration, (scrollRight / this.drawer.wrapper.scrollWidth) * (duration));
+  }
+
+  resizeContainer() {
+    let chn = this.getNumOfChannels();
+    let height = chn * this.params.height;
+
+    //must set position value!!!!
+    if (this.params.width)
+      utils.style(this.container, { 
+        position: 'relative',
+        background: this.params.backgroundColor, 
+        width: this.params.width+'px', 
+        height: height+'px'
+      });
+    else
+      utils.style(this.container, { 
+        position: 'relative',
+        background: this.params.backgroundColor, 
+        height: height+'px'
+      });
+
+    return {
+      name: 'waveform-wrapper',
+      width: this.params.width,
+      height: height
+    };
+    
+  }
+
+  setDbyArray(dbyArray) {
+    this.dbyArray = _.clone(dbyArray);
+  }
+
+  resizeAndDrawAll() {
+    let size;
+    
+    //when container update, resize immediatly to relative plugins, then draw buffer, for maybe
+    //need update some value such as dbyArray by plugins, so draw buffer later
+    size = this.resizeContainer();
+    this.fireEvent('resize', size);
+
+    this.renderResizeCross();
+    this.renderWavbuffer();
+
+    return size;
+  }
+
+  resizeAll() {
+    this.resizeAndDrawAll();
+  }
+
 
   createBackend() {
     if (this.backend) {
@@ -283,9 +381,29 @@ export default class WaveForm extends utils.Observer {
     this.backend.on('pause', () => this.fireEvent('pause'));
 
     this.backend.on('audioprocess', time => {
+      //console.log("current scroll left time: ", time, ",   ",  (this.drawer.getScrollX()/(2*this.drawer.wrapper.scrollWidth))*(this.backend.getDuration()));
       this.drawer.progress(this.backend.getPlayedPercents());
+
+      //time > viewEndTime need rebegin, but is scrollLeft+clientWidth must > currenttime, is small means we scroll the bar
+      //use rebeginTime can avoid scroll to switch view, when scroll, the viewEndTime < rebgeinTime, so is will now switchview
+      if (time >= this.getViewEndTime() && this.rebeginTime < this.getViewEndTime()) {
+        let pos = this.backend.getPlayedPercents()*this.drawer.wrapper.scrollWidth;
+        this.drawer.rebeginOnPosition(pos, true);
+      }
+      this.rebeginTime = time;
+
       this.fireEvent('audioprocess', time);
     });
+
+    this.backend.on('audioprocessdata', e => {
+      this.fireEvent('audioprocessdata', e);
+    });
+
+    this.backend.on('audioprocessdata_split', e => {
+      this.fireEvent('audioprocessdata_split', e);
+    });
+
+
   }
 
   createPeakCache() {
@@ -293,6 +411,128 @@ export default class WaveForm extends utils.Observer {
       this.peakCache = new PeakCache();
     }
   }
+
+  createResizeCross() {
+    this.handleRowResize = this.container.appendChild(
+    //this.handleRowResize = this.drawer.wrapper.appendChild(
+      document.createElement('handle')
+    );
+    this.handleRowResize.className = 'waveform-cross-handle waveform-cross-handle-row';
+  }
+
+  //for drawer wrapper need draw all waves
+  //so we need use fixed position to place the resize cross bar
+  //
+  //and this bar need relative change by the waveform wrapper change
+  renderResizeCross() {
+    let chn = this.getNumOfChannels();
+    let top = chn * this.params.height;
+
+    let wrapperRect = this.drawer.wrapper.getBoundingClientRect();
+
+    let cssRow = {
+      //cursor: 'row-resize',
+      position: 'absolute',
+      left: `0px`,
+      top: `${top}px`, // border 1 px, so from -1 offset px
+      width: `${this.params.width}px`,
+      height: `${this.resizeHeight}px`,
+      backgroundColor: 'rgb(49,49,49)',
+      //backgroundColor: 'red',
+      zIndex: 8 
+    };
+
+    if (this.params.enableResize)
+      cssRow.cursor = 'row-resize';
+
+    this.util.style(this.handleRowResize, cssRow);
+  }
+
+  renderWavbuffer() {
+    this.drawBuffer(false);
+    this.drawer.progress(this.backend.getPlayedPercents());
+  }
+
+  bindResizeEvents() {
+
+    (() => {
+      let touchId;
+      let resize = false;
+      let wrapperRect;
+
+      const onDown = e => {
+        if (e.touches && e.touches.length > 1) {
+          return;
+        }
+        touchId = e.targetTouches ? e.targetTouches[0].identifier : null;
+
+          // Store for scroll calculations
+        wrapperRect = this.container.getBoundingClientRect();
+
+        if (e.target.tagName.toLowerCase() == 'handle') {
+          if (e.target.classList.contains( 'waveform-cross-handle-row')) {
+            resize = 'row';
+          } 
+        } else {
+          resize = false;
+        }
+        this.resizeStatus = resize;
+      };
+
+      const onUp = e => {
+        if (e.touches && e.touches.length > 1) {
+          return;
+        }
+
+        if (resize) {
+          resize = false;
+          this.resizeStatus = resize;
+
+          this.renderResizeCross();
+        }
+      };
+
+      const onMove = e => {
+        if (e.touches && e.touches.length > 1) {
+          return;
+        }
+
+        if (e.targetTouches && e.targetTouches[0].identifier != touchId) {
+          return;
+        }
+
+        if (resize == 'row') {
+          let newHeight = e.clientY - wrapperRect.top;
+          let chn = this.getNumOfChannels();
+
+          this.params.height = parseInt(newHeight/chn);
+          this._onResize2();
+        }
+      };
+
+      this.container.addEventListener('mousedown', onDown);
+      this.container.addEventListener('touchstart', onDown);
+
+      //this.wrapper.addEventListener('mousemove', onMove);
+      document.body.addEventListener('mousemove', onMove);
+      document.body.addEventListener('touchmove', onMove);
+
+      document.body.addEventListener('mouseup', onUp);
+      document.body.addEventListener('touchend', onUp);
+
+      this.on('remove', () => {
+        document.body.removeEventListener('mouseup', onUp);
+        document.body.removeEventListener('touchend', onUp);
+        this.container.removeEventListener('mousemove', onMove);
+        this.container.removeEventListener('touchmove', onMove);
+      });
+
+    })();
+
+
+  }
+
+
 
   getDuration() {
     return this.backend.getDuration();
@@ -312,6 +552,9 @@ export default class WaveForm extends utils.Observer {
 
   play(start, end) {
     this.fireEvent('interaction', () => this.play(start, end));
+
+    this.rebeginTime = this.backend.getCurrentTime();
+
     return this.backend.play(start, end);
   }
 
@@ -358,7 +601,7 @@ export default class WaveForm extends utils.Observer {
             progress > 1
     ) {
       throw new Error(
-        'Error calling wavesurfer.seekTo, parameter must be a number between 0 and 1!'
+        'Error calling waveform.seekTo, parameter must be a number between 0 and 1!'
       );
     }
     this.fireEvent('interaction', () => this.seekTo(progress));
@@ -378,13 +621,16 @@ export default class WaveForm extends utils.Observer {
       this.backend.play();
     }
     this.params.scrollParent = oldScrollParent;
+
     this.fireEvent('seek', progress);
+    console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuu");
   }
 
   stop() {
     this.pause();
     this.seekTo(0);
     this.drawer.progress(0);
+    this.fireEvent('stop');
   }
 
   setSinkId(deviceId) {
@@ -446,7 +692,7 @@ export default class WaveForm extends utils.Observer {
 
   toggleScroll() {
     this.params.scrollParent = !this.params.scrollParent;
-    this.drawBuffer();
+    this.drawBuffer(true);
   }
 
   toggleInteraction() {
@@ -459,7 +705,7 @@ export default class WaveForm extends utils.Observer {
 
   setWaveColor(color) {
     this.params.waveColor = color;
-    this.drawBuffer();
+    this.drawBuffer(true);
   }
 
   getProgressColor() {
@@ -468,7 +714,7 @@ export default class WaveForm extends utils.Observer {
 
   setProgressColor(color) {
     this.params.progressColor = color;
-    this.drawBuffer();
+    this.drawBuffer(true);
   }
 
   getBackgroundColor() {
@@ -477,7 +723,11 @@ export default class WaveForm extends utils.Observer {
 
   setBackgroundColor(color) {
     this.params.backgroundColor = color;
-    utils.style(this.container, { background: this.params.backgroundColor });
+
+    if (this.params.width)
+      utils.style(this.container, { background: this.params.backgroundColor , width: this.params.width+'px'});
+    else
+      utils.style(this.container, { background: this.params.backgroundColor});
   }
 
   getCursorColor() {
@@ -497,13 +747,32 @@ export default class WaveForm extends utils.Observer {
     return this.backend.getNumOfChannels();
   }
 
-  setHeight(height) {
-    this.params.height = height;
-    this.drawer.setHeight(height * this.params.pixelRatio);
-    this.drawBuffer();
+  //for this.params.height in rectwraaper is the one channel height 
+  //so after load audio, we should readjust the params height by real
+  //rect range
+  adjustHeight() {
+    let wrapperRect = this.container.getBoundingClientRect();
+    let newHeight = wrapperRect.bottom - wrapperRect.top;
+    let chn = this.getNumOfChannels();
+
+    this.params.height = parseInt(newHeight/chn);
   }
 
-  drawBuffer() {
+  setHeight(height) {
+    let chn = this.getNumOfChannels();
+    this.params.height = height;
+
+    if (chn == 1) {
+      this.params.height = height;
+    } else {
+      this.params.height = parseInt(height/chn);
+    }
+
+    this.drawer.setHeight(this.params.height * this.params.pixelRatio);
+    this.drawBuffer(false);
+  }
+
+  drawBuffer(useFrame) {
     const nominalWidth = Math.round(
       this.getDuration() *
       this.params.minPxPerSec *
@@ -538,21 +807,31 @@ export default class WaveForm extends utils.Observer {
           newRanges[i][0],
           newRanges[i][1]
         );
-        this.drawer.drawPeaks(
-          peaks,
-          width,
-          newRanges[i][0],
-          newRanges[i][1]
-        );
+
+        if (useFrame) {
+          this.drawer.updateGridHeight(this.dbyArray);
+          this.drawer.drawPeaks2( peaks, width, newRanges[i][0], newRanges[i][1]);
+        } else {
+          this.drawer.updateGridHeight(this.dbyArray);
+          this.drawer.drawPeaks2( peaks, width, newRanges[i][0], newRanges[i][1]);
+        }
       }
     } else {
       peaks = this.backend.getPeaks(width, start, end);
-      this.drawer.drawPeaks(peaks, width, start, end);
+      if (useFrame) {
+        this.drawer.updateGridHeight(this.dbyArray);
+        this.drawer.drawPeaks2(peaks, width, start, end);
+      } else {
+        this.drawer.updateGridHeight(this.dbyArray);
+        this.drawer.drawPeaks2(peaks, width, start, end);
+      }
     }
+
     this.fireEvent('redraw', peaks, width);
   }
 
-  zoom(pxPerSec) {
+
+  _zoom(pxPerSec) {
     if (!pxPerSec) {
       this.params.minPxPerSec = this.defaultParams.minPxPerSec;
       this.params.scrollParent = false;
@@ -561,12 +840,53 @@ export default class WaveForm extends utils.Observer {
       this.params.scrollParent = true;
     }
 
-    this.drawBuffer();
+    this.drawBuffer(true);
     this.drawer.progress(this.backend.getPlayedPercents());
+  }
+
+  zoom(pxPerSec) {
+    this._zoom(pxPerSec)
 
     this.drawer.recenter(this.getCurrentTime() / this.getDuration());
     this.fireEvent('zoom', pxPerSec);
   }
+
+  zoomLeft(pxPerSec) {
+    this._zoom(pxPerSec)
+
+    if (this.section.section) {
+      this.drawer.recenter(this.section.getStartTime() / this.getDuration());
+    } else {
+      this.drawer.recenter(this.getCurrentTime() / this.getDuration());
+    }
+
+    this.fireEvent('zoom', pxPerSec);
+  }
+
+  zoomRight(pxPerSec) {
+    this._zoom(pxPerSec)
+
+    if (this.section.section) {
+      this.drawer.recenter(this.section.getEndTime() / this.getDuration());
+    } else {
+      this.drawer.recenter(this.getCurrentTime() / this.getDuration());
+    }
+
+    this.fireEvent('zoom', pxPerSec);
+  }
+
+  zoomSelection() {
+    let start = this.section.getStartTime();
+    let end = this.section.getEndTime();
+
+    let width = this.drawer.wrapper.clientWidth;
+    let pxPerSec = width / (end-start)
+
+    this._zoom(pxPerSec)
+
+    this.drawer.recenter((this.section.getStartTime()+(end-start)/2) / this.getDuration());
+  }
+
 
   loadArrayBuffer(arraybuffer) {
     this.decodeArrayBuffer(arraybuffer, data => {
@@ -577,15 +897,32 @@ export default class WaveForm extends utils.Observer {
   }
 
   loadDecodedBuffer(buffer) {
+    console.log("22222222222222222: ",buffer);
+    this.fileDecodeSize = buffer.length;
+    this.fileDuration = buffer.duration;
+    this.fileSampleRate = buffer.sampleRate;
+    this.fileChannels = buffer.numberOfChannels;
+
     this.backend.load(buffer)
     .then(renderBuffer => {
-      this.drawBuffer();
-      this.fireEvent('ready');
+      //adjust up to the channels of audio
+      this.adjustHeight();
+
       this.isReady = true;
+      this.fireEvent('ready');
+
+      //update timexline in drawer to draw time/db grid
+      this.drawer.updateGridWidth(this.timexArray);
+      this.drawBuffer(true);
+
     });
   }
 
   loadBlob(blob) {
+    this.fileName = blob.name;
+    this.fileSize = blob.size;
+
+
     // Create file reader
     const reader = new FileReader();
     reader.addEventListener('progress', e => this.onProgress(e));
@@ -610,7 +947,7 @@ export default class WaveForm extends utils.Observer {
 
     if (peaks) {
       this.backend.setPeaks(peaks, duration);
-      this.drawBuffer();
+      this.drawBuffer(true);
       this.tmpEvents.push(this.once('interaction', load));
     } else {
       return load();
@@ -699,28 +1036,41 @@ export default class WaveForm extends utils.Observer {
   }
 
   exportRenderBuffer() {
-    console.log("11111111111: ", this.backend);
+    //console.log("11111111111: ", this.backend);
     this.backend.exportRenderBuffer()
   }
 
   cutDelete() {
-    //this.backend.cutDelete()
-    //this.backend.cutDelete(2, 30)
-    this.backend.cutDelete(30, 40)
+    let start = this.section.getStartTime();
+    let end = this.section.getEndTime();
+
+    this.backend.cutDelete(start, end)
     .then(renderBuffer => {
-      this.drawBuffer();
-      this.fireEvent('ready');
-      this.isReady = true;
+      this.drawBuffer(true);
+      this.section.clear();
+      //this.fireEvent('ready');
+      //this.isReady = true;
     });
 
   }
 
   recoverAction() {
     this.backend.recoverAction()
-    .then(renderBuffer => {
-      this.drawBuffer();
-      this.fireEvent('ready');
-      this.isReady = true;
+    .then(result => {
+      if (!result.action)
+        return;
+
+      if (result.action.cmd == "cutDelete") {
+        this.section.clear();
+        this.section.add({
+          start: result.action.data.start,
+          end: result.action.data.end,
+        });
+      }
+
+      this.drawBuffer(true);
+      //this.fireEvent('ready');
+      //this.isReady = true;
     });
   }
 

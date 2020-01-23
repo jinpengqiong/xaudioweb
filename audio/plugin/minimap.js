@@ -1,49 +1,6 @@
-/*eslint no-console: ["error", { allow: ["warn"] }] */
-/**
- * @typedef {Object} MinimapPluginParams
- * @desc Extends the `WavesurferParams` wavesurfer was initialised with
- * @property {?string|HTMLElement} container CSS selector or HTML element where
- * the map should be rendered. By default it is simply appended
- * after the waveform.
- * @property {?boolean} deferInit Set to true to manually call
- * `initPlugin('minimap')`
- */
+import * as utils from '../../utils';
 
-/**
- * Renders a smaller version waveform as a minimap of the main waveform.
- *
- * @implements {PluginClass}
- * @extends {Observer}
- * @example
- * // es6
- * import MinimapPlugin from 'wavesurfer.minimap.js';
- *
- * // commonjs
- * var MinimapPlugin = require('wavesurfer.minimap.js');
- *
- * // if you are using <script> tags
- * var MinimapPlugin = window.WaveSurfer.minimap;
- *
- * // ... initialising wavesurfer with the plugin
- * var wavesurfer = WaveSurfer.create({
- *   // wavesurfer options ...
- *   plugins: [
- *     MinimapPlugin.create({
- *       // plugin options ...
- *     })
- *   ]
- * });
- */
 export default class MinimapPlugin {
-    /**
-     * Minimap plugin definition factory
-     *
-     * This function must be used to create a plugin definition which can be
-     * used by wavesurfer to correctly instantiate the plugin.
-     *
-     * @param  {MinimapPluginParams} params parameters use to initialise the plugin
-     * @return {PluginDefinition} an object representing the plugin
-     */
     static create(params) {
         return {
             name: 'minimap',
@@ -54,10 +11,10 @@ export default class MinimapPlugin {
         };
     }
 
-    constructor(params, ws) {
-        this.params = ws.util.extend(
+    constructor(params, wf) {
+        this.params = wf.util.extend(
             {},
-            ws.params,
+            wf.params,
             {
                 showRegions: false,
                 showOverview: false,
@@ -65,7 +22,8 @@ export default class MinimapPlugin {
                 overviewBorderSize: 2,
                 // the container should be different
                 container: false,
-                height: Math.max(Math.round(ws.params.height / 4), 20)
+                pixelRatio: window.devicePixelRatio || screen.deviceXDPI / screen.logicalXDPI,
+                height: Math.max(Math.round(wf.params.height / 4), 20)
             },
             params,
             {
@@ -85,33 +43,25 @@ export default class MinimapPlugin {
         }
         // if no container is specified add a new element and insert it
         if (!params.container) {
-            this.params.container = ws.util.style(
+            this.params.container = wf.util.style(
                 document.createElement('minimap'),
                 {
                     display: 'block'
                 }
             );
         }
-        this.drawer = new ws.Drawer(this.params.container, this.params);
-        this.wavesurfer = ws;
-        this.util = ws.util;
-        /**
-         * Minimap needs to listen for the `ready` and `waveform-ready` events
-         * to work with the `MediaElement` backend. The moment the `ready` event
-         * is called is different (and peaks would not load).
-         *
-         * @type {string}
-         * @see https://github.com/katspaugh/wavesurfer.js/issues/736
-         */
+        this.drawer = new wf.Drawer(this.params.container, this.params);
+        this.waveform = wf;
+        this.util = wf.util;
         this.renderEvent =
-            ws.params.backend === 'MediaElement' ? 'waveform-ready' : 'ready';
+            wf.params.backend === 'MediaElement' ? 'waveform-ready' : 'ready';
         this.overviewRegion = null;
 
         this.drawer.createWrapper();
         this.createElements();
         let isInitialised = false;
 
-        // ws ready event listener
+        // wf ready event listener
         this._onShouldRender = () => {
             // only bind the events in the first run
             if (!isInitialised) {
@@ -122,22 +72,25 @@ export default class MinimapPlugin {
             // if there is no such element, append it to the container (below
             // the waveform)
             if (!document.body.contains(this.params.container)) {
-                ws.container.insertBefore(this.params.container, null);
+                wf.container.insertBefore(this.params.container, null);
             }
 
-            if (this.wavesurfer.regions && this.params.showRegions) {
+            if (this.waveform.regions && this.params.showRegions) {
                 this.regions();
             }
+
+            this.adjustSize();
+
             this.render();
         };
 
         this._onAudioprocess = currentTime => {
-            this.drawer.progress(this.wavesurfer.backend.getPlayedPercents());
+            this.drawer.progress(this.waveform.backend.getPlayedPercents());
         };
 
-        // ws seek event listener
+        // wf seek event listener
         this._onSeek = () =>
-            this.drawer.progress(ws.backend.getPlayedPercents());
+            this.drawer.progress(wf.backend.getPlayedPercents());
 
         // event listeners for the overview region
         this._onScroll = e => {
@@ -151,40 +104,40 @@ export default class MinimapPlugin {
             }
         };
         let prevWidth = 0;
-        this._onResize = ws.util.debounce(() => {
+        this._onResize = wf.util.debounce(() => {
             if (prevWidth != this.drawer.wrapper.clientWidth) {
                 prevWidth = this.drawer.wrapper.clientWidth;
                 this.render();
                 this.drawer.progress(
-                    this.wavesurfer.backend.getPlayedPercents()
+                    this.waveform.backend.getPlayedPercents()
                 );
             }
         });
         this._onZoom = e => {
             this.render();
         };
-        this.wavesurfer.on('zoom', this._onZoom);
+        this.waveform.on('zoom', this._onZoom);
     }
 
     init() {
-        if (this.wavesurfer.isReady) {
+        if (this.waveform.isReady) {
             this._onShouldRender();
         }
-        this.wavesurfer.on(this.renderEvent, this._onShouldRender);
+        this.waveform.on(this.renderEvent, this._onShouldRender);
     }
 
     destroy() {
         window.removeEventListener('resize', this._onResize, true);
         window.removeEventListener('orientationchange', this._onResize, true);
-        this.wavesurfer.drawer.wrapper.removeEventListener(
+        this.waveform.drawer.wrapper.removeEventListener(
             'mouseover',
             this._onMouseover
         );
-        this.wavesurfer.un(this.renderEvent, this._onShouldRender);
-        this.wavesurfer.un('seek', this._onSeek);
-        this.wavesurfer.un('scroll', this._onScroll);
-        this.wavesurfer.un('audioprocess', this._onAudioprocess);
-        this.wavesurfer.un('zoom', this._onZoom);
+        this.waveform.un(this.renderEvent, this._onShouldRender);
+        this.waveform.un('seek', this._onSeek);
+        this.waveform.un('scroll', this._onScroll);
+        this.waveform.un('audioprocess', this._onAudioprocess);
+        this.waveform.un('zoom', this._onZoom);
         this.drawer.destroy();
         this.overviewRegion = null;
         this.unAll();
@@ -193,17 +146,17 @@ export default class MinimapPlugin {
     regions() {
         this.regions = {};
 
-        this.wavesurfer.on('region-created', region => {
+        this.waveform.on('region-created', region => {
             this.regions[region.id] = region;
             this.renderRegions();
         });
 
-        this.wavesurfer.on('region-updated', region => {
+        this.waveform.on('region-updated', region => {
             this.regions[region.id] = region;
             this.renderRegions();
         });
 
-        this.wavesurfer.on('region-removed', region => {
+        this.waveform.on('region-removed', region => {
             delete this.regions[region.id];
             this.renderRegions();
         });
@@ -219,11 +172,11 @@ export default class MinimapPlugin {
         Object.keys(this.regions).forEach(id => {
             const region = this.regions[id];
             const width =
-                this.drawer.width *
-                ((region.end - region.start) / this.wavesurfer.getDuration());
+                this.getWidth() *
+                ((region.end - region.start) / this.waveform.getDuration());
             const left =
-                this.drawer.width *
-                (region.start / this.wavesurfer.getDuration());
+                this.getWidth() *
+                (region.start / this.waveform.getDuration());
             const regionElement = this.util.style(
                 document.createElement('region'),
                 {
@@ -267,11 +220,11 @@ export default class MinimapPlugin {
     bindWavesurferEvents() {
         window.addEventListener('resize', this._onResize, true);
         window.addEventListener('orientationchange', this._onResize, true);
-        this.wavesurfer.on('audioprocess', this._onAudioprocess);
-        this.wavesurfer.on('seek', this._onSeek);
+        this.waveform.on('audioprocess', this._onAudioprocess);
+        this.waveform.on('seek', this._onSeek);
         if (this.params.showOverview) {
-            this.wavesurfer.on('scroll', this._onScroll);
-            this.wavesurfer.drawer.wrapper.addEventListener(
+            this.waveform.on('scroll', this._onScroll);
+            this.waveform.drawer.wrapper.addEventListener(
                 'mouseover',
                 this._onMouseover
             );
@@ -297,7 +250,7 @@ export default class MinimapPlugin {
             this.on('click', (event, position) => {
                 if (seek) {
                     this.drawer.progress(position);
-                    this.wavesurfer.seekAndCenter(position);
+                    this.waveform.seekAndCenter(position);
                 } else {
                     seek = true;
                 }
@@ -339,20 +292,22 @@ export default class MinimapPlugin {
 
     render() {
         const len = this.drawer.getWidth();
-        const peaks = this.wavesurfer.backend.getPeaks(len, 0, len);
+        const peaks = this.waveform.backend.getPeaks(len, 0, len);
+
+        this.drawer.setHeight(this.params.height * this.params.pixelRatio);
         this.drawer.drawPeaks(peaks, len, 0, len);
-        this.drawer.progress(this.wavesurfer.backend.getPlayedPercents());
+        this.drawer.progress(this.waveform.backend.getPlayedPercents());
 
         if (this.params.showOverview) {
             //get proportional width of overview region considering the respective
             //width of the drawers
-            this.ratio = this.wavesurfer.drawer.width / this.drawer.width;
-            this.waveShowedWidth = this.wavesurfer.drawer.width / this.ratio;
-            this.waveWidth = this.wavesurfer.drawer.width;
+            this.ratio = this.waveform.drawer.width / this.drawer.width;
+            this.waveShowedWidth = this.waveform.drawer.width / this.ratio;
+            this.waveWidth = this.waveform.drawer.width;
             this.overviewWidth = this.drawer.container.offsetWidth / this.ratio;
             this.overviewPosition = 0;
             this.moveOverviewRegion(
-                this.wavesurfer.drawer.wrapper.scrollLeft / this.ratio
+                this.waveform.drawer.wrapper.scrollLeft / this.ratio
             );
             this.overviewRegion.style.width = this.overviewWidth + 'px';
         }
@@ -372,8 +327,32 @@ export default class MinimapPlugin {
         }
         this.overviewRegion.style.left = this.overviewPosition + 'px';
         if (this.draggingOverview) {
-            this.wavesurfer.drawer.wrapper.scrollLeft =
+            this.waveform.drawer.wrapper.scrollLeft =
                 this.overviewPosition * this.ratio;
         }
     }
+
+    getWidth() {
+        return this.drawer.width / this.params.pixelRatio;
+    }
+
+    adjustSize() {
+      let wrapperRect = this.params.container.getBoundingClientRect();
+      let newHeight = wrapperRect.bottom - wrapperRect.top;
+      let chn = this.waveform.getNumOfChannels();
+
+      this.params.height = parseInt(newHeight/chn);
+
+      if (this.params.width) {
+        utils.style(this.params.container, { 
+          background: this.params.backgroundColor, 
+          width: this.params.width+'px', 
+        });
+      }
+
+
+    }
+
+
+
 }

@@ -7,13 +7,14 @@ const PAUSED = 'paused';
 const FINISHED = 'finished';
 
 export default class WebAudio extends utils.Observer {
-  static scriptBufferSize = 256;
+  static scriptBufferSize = 1024; //256;
   audioContext = null;
   offlineAudioContext = null;
   stateBehaviors = {
     [PLAYING]: {
       init() {
         this.addOnAudioProcess();
+        this.addOnAudioProcessForSplit();
       },
       getPlayedPercents() {
         const duration = this.getDuration();
@@ -26,6 +27,7 @@ export default class WebAudio extends utils.Observer {
     [PAUSED]: {
       init() {
         this.removeOnAudioProcess();
+        this.removeOnAudioProcessForSplit();
       },
       getPlayedPercents() {
         const duration = this.getDuration();
@@ -38,6 +40,7 @@ export default class WebAudio extends utils.Observer {
     [FINISHED]: {
       init() {
         this.removeOnAudioProcess();
+        this.removeOnAudioProcessForSplit();
         this.fireEvent('finish');
       },
       getPlayedPercents() {
@@ -54,19 +57,19 @@ export default class WebAudio extends utils.Observer {
   }
 
   getAudioContext() {
-    if (!window.WaveSurferAudioContext) {
-      window.WaveSurferAudioContext = new (window.AudioContext ||
+    if (!window.WaveFormAudioContext) {
+      window.WaveFormAudioContext = new (window.AudioContext ||
                                            window.webkitAudioContext)();
     }
-    return window.WaveSurferAudioContext;
+    return window.WaveFormAudioContext;
   }
 
   getOfflineAudioContext(sampleRate) {
-    if (!window.WaveSurferOfflineAudioContext) {
-      window.WaveSurferOfflineAudioContext = new (window.OfflineAudioContext ||
+    if (!window.WaveFormOfflineAudioContext) {
+      window.WaveFormOfflineAudioContext = new (window.OfflineAudioContext ||
                                                   window.webkitOfflineAudioContext)(1, 2, sampleRate);
     }
-    return window.WaveSurferOfflineAudioContext;
+    return window.WaveFormOfflineAudioContext;
   }
 
   constructor(params) {
@@ -85,8 +88,10 @@ export default class WebAudio extends utils.Observer {
       [FINISHED]: Object.create(this.stateBehaviors[FINISHED])
     };
     this.analyser = null;
+    this.analyserSplit = [];
     this.buffer = null;
     this.renderBuffer = null;
+    this.renderGain = 1.0;
     this.editActions = [];
     this.filters = [];
     this.gainNode = null;
@@ -95,18 +100,19 @@ export default class WebAudio extends utils.Observer {
     this.offlineAc = null;
     this.peaks = null;
     this.playbackRate = 1;
-    this.analyser = null;
     this.scriptNode = null;
+    this.scriptSplitNode = [];
     this.source = null;
+    this.splitter = null;
     this.splitPeaks = [];
     this.state = null;
     this.explicitDuration = params.duration;
   }
 
   init() {
-    this.createScriptNode();
     this.createVolumeNode();
     this.createAnalyserNode();
+    this.createScriptNode();
 
     this.setState(PAUSED);
     this.setPlaybackRate(this.params.audioRate);
@@ -171,27 +177,95 @@ export default class WebAudio extends utils.Observer {
         );
       }
     }
-    this.scriptNode.connect(this.ac.destination);
+    this.scriptNode.connect(this.analyser);
+  }
+
+
+  createScriptSplitNode() {
+    let channels = this.getNumOfChannels();
+
+    for (let i = 0; i < channels; i++) {
+      if (this.ac.createScriptProcessor) {
+        this.scriptSplitNode[i] = this.ac.createScriptProcessor(
+          WebAudio.scriptBufferSize
+        );
+      } else {
+        this.scriptSplitNode[i] = this.ac.createJavaScriptNode(
+          WebAudio.scriptBufferSize
+        );
+      }
+
+      this.scriptSplitNode[i].connect(this.analyserSplit[i]);
+    }
+  }
+
+
+
+  passAudio(e) {
+    let inputBuffer = e.inputBuffer;
+    let outputBuffer = e.outputBuffer;
+
+    for (let i = 0; i < inputBuffer.numberOfChannels; i++) {
+      outputBuffer.copyToChannel(inputBuffer.getChannelData(i), i, 0);
+    }
   }
 
   addOnAudioProcess() {
-    this.scriptNode.onaudioprocess = () => {
+    this.scriptNode.onaudioprocess = (e) => {
+      //time fire
       const time = this.getCurrentTime();
 
       if (time >= this.getDuration()) {
         this.setState(FINISHED);
         this.fireEvent('pause');
+        this.fireEvent('audioprocess', this.getDuration());
       } else if (time >= this.scheduledPause) {
         this.pause();
+        this.fireEvent('audioprocess', time);
       } else if (this.state === this.states[PLAYING]) {
         this.fireEvent('audioprocess', time);
+        this.fireEvent('audioprocessdata', e);
       }
+
+      this.passAudio(e);
     };
   }
 
+  addOnAudioProcessForSplit() {
+    let channels = this.getNumOfChannels();
+
+    for (let i = 0; i < channels; i++) {
+      this.scriptSplitNode[i].onaudioprocess = (e) => {
+        //time fire
+        const time = this.getCurrentTime();
+
+        if (this.state === this.states[PLAYING]) {
+          this.fireEvent('audioprocessdata_split',  {
+            channel: i,
+            event: e,
+            time: time
+          });
+        }
+
+        this.passAudio(e);
+      };
+    }
+  }
+
   removeOnAudioProcess() {
-    if (this.scriptNode)
+    if (this.scriptNode) {
       this.scriptNode.onaudioprocess = () => {};
+    }
+  }
+
+  removeOnAudioProcessForSplit() {
+    let channels = this.getNumOfChannels();
+
+    for (let i = 0; i < channels; i++) {
+      if (this.scriptSplitNode[i]) {
+        this.scriptSplitNode.onaudioprocess = () => {};
+      }
+    }
   }
 
   //for play and volume controle 
@@ -209,7 +283,23 @@ export default class WebAudio extends utils.Observer {
   //for play and show
   createAnalyserNode() {
     this.analyser = this.ac.createAnalyser();
-    this.analyser.connect(this.gainNode);
+    //this.analyser.connect(this.gainNode);
+
+    this.analyser.minDecibels = -90;
+    this.analyser.maxDecibels = 0;
+    //console.log("-------min dB:", this.analyser.minDecibels);
+    //console.log("-------max dB", this.analyser.maxDecibels);
+  }
+
+  createAnalyserSplitNode() {
+    let channels = this.getNumOfChannels();
+
+    for (let i = 0; i < channels; i++) {
+      this.analyserSplit[i] = this.ac.createAnalyser();
+
+      this.analyserSplit[i].minDecibels = -90;
+      this.analyserSplit[i].maxDecibels = 0;
+    }
   }
 
 
@@ -220,6 +310,9 @@ export default class WebAudio extends utils.Observer {
     } else {
       this.gainProcessNode = this.offlineAc.createGainNode();
     }
+
+    this.gainProcessNode.gain.setValueAtTime(this.renderGain, this.offlineAc.currentTime);
+
     // Add the gain node to the graph
     this.gainProcessNode.connect(this.offlineAc.destination);
   }
@@ -248,6 +341,23 @@ export default class WebAudio extends utils.Observer {
       return Promise.reject(new Error('Invalid deviceId: ' + deviceId));
     }
   }
+
+  //getCurrentGain() {
+    //return this.renderGain;
+  //}
+
+  //gainUp() {
+    //this.renderGain *= 2.0;
+    //return this.startRenderBuffer(this.renderBuffer);
+  //}
+
+  //gainDown() {
+    //this.renderGain *= 0.5;
+  //}
+
+  //gainReset() {
+    //this.renderGain = 1.0;
+  //}
 
   setVolume(value) {
     this.gainNode.gain.setValueAtTime(value, this.ac.currentTime);
@@ -421,24 +531,41 @@ export default class WebAudio extends utils.Observer {
       // clear the actual audiocontext, either passed as param or the
       // global singleton
       if (!this.params.audioContext) {
-        window.WaveSurferAudioContext = null;
+        window.WaveFormAudioContext = null;
       } else {
         this.params.audioContext = null;
       }
       // clear the offlineAudioContext
-      window.WaveSurferOfflineAudioContext = null;
+      window.WaveFormOfflineAudioContext = null;
     }
+  }
+
+  createSplitNodes() {
+    let channels = this.getNumOfChannels();
+
+    this.createAnalyserSplitNode();
+    this.createScriptSplitNode();
+
+    this.splitter = this.ac.createChannelSplitter(channels);
+
+    for (let i = 0; i < channels; i++) {
+      this.splitter.connect(this.scriptSplitNode[i], i);
+    }
+
   }
 
   load(buffer) {
     this.startPosition = 0;
     this.lastPlay = this.ac.currentTime;
     this.buffer = buffer;
+
+    this.createSplitNodes();
+
     return this.startRenderBuffer(buffer);
   }
 
   exportRenderBuffer() {
-    console.log("11111111111111", this.renderBuffer);
+    //console.log("11111111111111", this.renderBuffer);
     let wav = audioBufferToWav(this.renderBuffer);
     downFile(wav, "hehe.wav");
   }
@@ -447,8 +574,11 @@ export default class WebAudio extends utils.Observer {
     let deltaT = 1. / this.renderBuffer.sampleRate;
 
     //startOffset and endOffset is the cut range
-    let startOffset = startTime / deltaT;
-    let endOffset = endTime / deltaT;
+    let startOffset = parseInt(startTime / deltaT);
+    let endOffset = parseInt(endTime / deltaT);
+
+    //console.log("@@@1: ", startOffset);
+    //console.log("@@@2", endOffset);
 
     let frameCount = this.renderBuffer.length - (endOffset - startOffset); 
 
@@ -481,8 +611,10 @@ export default class WebAudio extends utils.Observer {
     this.editActions.push({
       cmd: "cutDelete",
       data: {
-        start: startOffset,
-        end: endOffset,
+        start: startTime,
+        end: endTime,
+        startOffset: startOffset,
+        endOffset: endOffset,
         buffer: delBuffer
       }
     })
@@ -493,9 +625,22 @@ export default class WebAudio extends utils.Observer {
   recoverAction() {
     let action = this.editActions.pop();
 
-    if (action.cmd == "cutDelete") {
-      return this.recoverDeleteRange(action.data.start, action.data.end, action.data.buffer);
-    } 
+    if (action) {
+      if (action.cmd == "cutDelete") {
+        return this.recoverDeleteRange(action.data.startOffset, action.data.endOffset, action.data.buffer)
+        .then(function(renderBuffer) {
+          return {
+            action: action, 
+            buffer: renderBuffer
+          };
+        });
+      } 
+    }
+
+    return Promise.resolve({
+      action: null,
+      buffer: null
+    });
   }
 
 
@@ -537,7 +682,8 @@ export default class WebAudio extends utils.Observer {
 
     //create offline audio context graph, gain node, scripte node, analyser node
     this.offlineAc = new window.OfflineAudioContext(buffer.numberOfChannels, 
-                                                    buffer.sampleRate*(parseInt(buffer.duration)+1), 
+                                                    //buffer.sampleRate*(parseInt(buffer.duration)+1), 
+                                                    buffer.length,
                                                     buffer.sampleRate);
 
     this.createGainProcessNode();
@@ -576,8 +722,10 @@ export default class WebAudio extends utils.Observer {
       this.ac.currentTime
     );
     this.source.buffer = this.renderBuffer;
-    //this.source.connect(this.ac.destination);
-    this.source.connect(this.analyser);
+    this.source.connect(this.gainNode);
+    this.source.connect(this.scriptNode);
+
+    this.source.connect(this.splitter);
   }
 
   isPaused() {
@@ -632,8 +780,6 @@ export default class WebAudio extends utils.Observer {
     if (!this.renderBuffer) {
       return;
     }
-
-    console.log("888888888888: ", this.renderBuffer);
 
     // need to re-create source on each playback
     this.createPlaySource();

@@ -24,6 +24,7 @@ export const WrapperRelative = styled.div`
   position: relative;
   top: ${props => (props.top ? props.top : 0)};
   left: ${props => (props.left ? props.left : 0)};
+  background-color: ${props => (props.backgroundColor ? props.backgroundColor : 'white')};
 `;
 
 export const HeaderLogo = styled.div`

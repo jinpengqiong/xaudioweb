@@ -2,6 +2,8 @@ const withLess = require('@zeit/next-less')
 const lessToJS = require('less-vars-to-js')
 const fs = require('fs')
 const path = require('path')
+const darkTheme = require('@ant-design/dark-theme')
+//import darkTheme from '@ant-design/dark-theme';
 
 // Where your antd-custom.less file lives
 const themeVariables = lessToJS(
@@ -34,6 +36,16 @@ module.exports = withLess({
       //options: { name: '[hash].worker.js', publicPath: '/static/' }
       //options: { publicPath: '/static/' }
     })
+
+
+    //config.module.rules.push({
+      //loader: 'less-loader',
+      //options: {
+        //modifyVars: darkTheme,
+      //},
+
+    //})
+
 
     // Important: return the modified config
     return config

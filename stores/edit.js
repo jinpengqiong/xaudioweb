@@ -7,6 +7,8 @@ const EditStore = t
     fileName: t.optional(t.string, ''),
     isLoading: t.optional(t.boolean, false),
     isProcessing: t.optional(t.boolean, false),
+    isPlaying: t.optional(t.boolean, false),
+    switchView: t.optional(t.string, 'right'),
   })
   .views(self => ({
     get root() {
@@ -26,7 +28,7 @@ const EditStore = t
       self.isProcessing = true;
 
 
-      console.log("11111111111", file);
+      //console.log("11111111111", file);
 
 
       //if (!checkValidAudioFile(file)) {
@@ -39,6 +41,13 @@ const EditStore = t
       return processEditFile(self, file)
     },
 
+    setPlaying(status) {
+      self.isPlaying = status;
+    },
+
+    setSwitchView(v) {
+      self.switchView = v;
+    },
 
 
 
